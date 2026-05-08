@@ -1,0 +1,5 @@
+[requires]
+MiddlewarePkg/1.0.0@gcs/stable
+
+[generators]
+cmake_find_package
