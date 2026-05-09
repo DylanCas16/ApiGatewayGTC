@@ -1,7 +1,7 @@
 add_subdirectory(NamingService)
 add_subdirectory(InterfaceRepository)
-add_subdirectory(DII)
- 
+# add_subdirectory(DII)
+
 add_library(lib_corba_runtime STATIC
     corba_runtime.cpp
 )
