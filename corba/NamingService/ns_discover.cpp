@@ -1,4 +1,5 @@
 #include "ns_discover.hpp"
+#include "../gcs_endpoints.h"
 
 #include <iostream>
 #include <sstream>
@@ -8,7 +9,7 @@
 #include <tao/IIOP_Profile.h>
 
 
-void object_type(CORBA::Object_ptr target) {
+static void object_type(CORBA::Object_ptr target) {
     try {
         CORBA::String_var repo_id = target->_repository_id();
         std::cout << "    type    : " << repo_id.in() << std::endl;
@@ -17,7 +18,7 @@ void object_type(CORBA::Object_ptr target) {
     }
 }
 
-void object_endpoint(CORBA::Object_ptr target) {
+static void object_endpoint(CORBA::Object_ptr target) {
     TAO_Stub* stub = target->_stubobj();
     if (!stub) {
         std::cout << "    endpoint: (stub not available)" << std::endl;

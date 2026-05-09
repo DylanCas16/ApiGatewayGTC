@@ -1,120 +1,113 @@
+#include "ifr_client.h"
+#include "../gcs_endpoints.h"
+
 #include <iostream>
-#include <string>
-#include <tao/ORB.h>
-#include <tao/IFR_Client/IFR_BasicC.h>
-#include <orbsvcs/CosNamingC.h>
+#include <stdexcept>
 
 
-CORBA::Object_var discoverNs(const CORBA::ORB_ptr orb) {
-    CORBA::Object_var ns_obj = orb->resolve_initial_references("NameService");
-
-    CosNaming::NamingContext_var root = CosNaming::NamingContext::_narrow(ns_obj.in());
-
-    CosNaming::Name path;
-    path.length(2);
-    path[0].id = "Test";
-    path[0].kind = "container";
-    path[1].id = "InspectorDevice_1";
-    path[1].kind = "";
-
-    return root->resolve(path);
-}
-
-void printOperations(const CORBA::InterfaceDef::FullInterfaceDescription_var& interface) {
-    std::cout << "Interface : " << interface->name.in() << std::endl;
-    std::cout << "ID        : " << interface->id.in() << std::endl;
-    std::cout << "Operations:" << interface->operations.length() << std::endl;
-
-    for (CORBA::ULong i=0; i < interface->operations.length(); i++) {
+static InterfaceInfo getInterface(const std::string& repid,
+            const CORBA::InterfaceDef::FullInterfaceDescription_var& interface) {
+    
+    InterfaceInfo i_info;
+    i_info.repid = repid;
+    
+    for (CORBA::ULong i = 0; i < interface->operations.length(); ++i) {
         const CORBA::OperationDescription& op = interface->operations[i];
-
-        std::cout << "[" << i << "]" << op.name.in() << std::endl;
-        std::cout << "TypeCode: " << op.result->kind();
-        
-        try { std::cout << " (" << op.result->name() << ")"; }
-        catch (...) {}
-        std::cout << std::endl;
-        
-        std::cout << "Parameters: ";
-            
-        if (op.parameters.length() == 0) {
-            std::cout << "(none)";
-        } 
-        else {
-            for (CORBA::ULong p = 0; p < op.parameters.length(); p++) {
-                const CORBA::ParameterDescription& param = op.parameters[p];
-                const char* type =
-                param.mode == CORBA::PARAM_IN    ? "in"    :
-                    param.mode == CORBA::PARAM_OUT   ? "out"   : "inout";
-            
-                std::cout << "\n -  " << type << " " << param.name.in();
-            }
-        }
-        std::cout << "\n\n";
+        OperationInfo o_info;
+        o_info.name      = op.name.in();
+        o_info.return_tc = CORBA::TypeCode::_duplicate(op.result.in());
+        o_info.params    = op.parameters;
+        i_info.operations.push_back(std::move(o_info));
     }
+
+    std::cout << "[IfrClient] described " << repid
+              << " (" << i_info.operations.size() << " ops)" << std::endl;
+    return i_info;
 }
 
-void printAttributes(const CORBA::InterfaceDef::FullInterfaceDescription_var& interface) {
-    std::cout << "Attributes: " << interface->attributes.length() << std::endl;
-
-    for (CORBA::ULong i = 0; i < interface->attributes.length(); ++i) {
-        const CORBA::AttributeDescription& attr = interface->attributes[i];
-        std::cout << "  - " << attr.name.in() << "  TypeCode: " << attr.type->kind();
-            
-        try { std::cout << " (" << attr.type->name() << ")"; }
-        catch (...) {}
-            
-        std::cout << std::endl;
-    }
+std::string IfrClient::cacheKey(const std::string& repid,
+                                const std::string& method) {
+    return repid + "#" + method;
 }
 
-int main(int argc, char* argv[]) {
-    try {
-        CORBA::ORB_var orb = CORBA::ORB_init(argc, argv);
+IfrClient::IfrClient(CORBA::ORB_ptr orb) : orb_(CORBA::ORB::_duplicate(orb)) {}
 
-        // Naming Service
-        CORBA::Object_var target = discoverNs(orb.in());
+void IfrClient::connect() {
+    std::cout << "[IfrClient] connecting to " << gcs_env::IFR_URL << std::endl;
 
-        if (CORBA::is_nil(target.in())) {
-            std::cerr << "Could not find InspectorDevice_1" << std::endl;
-            return 1;
-        }
-        std::cout << "InspectorDevice_1 found" << std::endl;
-
-        // IFR
-        CORBA::Object_var ifr_obj = orb->resolve_initial_references("InterfaceRepository");
-        CORBA::Repository_var repository = CORBA::Repository::_narrow(ifr_obj.in());
-        if (CORBA::is_nil(repository.in())) {
-            std::cerr << "Could not connect to the IFR" << std::endl;
-            return 1;
-        }
-        
-        CORBA::String_var repid = target->_repository_id();
-        CORBA::Contained_var contained = repository->lookup_id(repid.in());
-        if (CORBA::is_nil(contained.in())) {
-            std::cerr << "ID not found in the IFR: " << repid.in() << std::endl;
-            return 1;
-        }
-
-        // InterfaceDef: tipo concreto de IFR
-        CORBA::InterfaceDef_var interface_def = CORBA::InterfaceDef::_narrow(contained.in());
-        if (is_nil(interface_def.in())) {
-            std::cerr << "The Interface found was not a InterfaceDef" << std::endl;
-            return 1;
-        } 
-
-        // describe_interface(): obtencion de operaciones y atributos
-        CORBA::InterfaceDef::FullInterfaceDescription_var interface = 
-            interface_def->describe_interface();
-        
-        printOperations(interface);
-        printAttributes(interface);
-
-        orb->destroy();
-    } 
-    catch (const CORBA::Exception& ex) {
-        std::cerr << "CORBA exception: " << ex._info().c_str() << std::endl;
-        return 1;
+    CORBA::Object_var obj = orb_->string_to_object(gcs_env::IFR_URL);
+    if (CORBA::is_nil(obj.in())) {
+        throw std::runtime_error("IfrClient: string_to_object returned nil");
     }
-    return 0;
+        
+    repository_ = CORBA::Repository::_narrow(obj.in());
+    if (CORBA::is_nil(repository_.in())) {
+        throw std::runtime_error("IfrClient: reference is not a CORBA::Repository");
+    }
+
+    std::cout << "[IfrClient] connected" << std::endl;
+}
+
+InterfaceInfo IfrClient::fetchFromIfr(const std::string& repid) {
+    CORBA::Contained_var contained = repository_->lookup_id(repid.c_str());
+    if (CORBA::is_nil(contained.in())) {
+        throw std::runtime_error("ID not found in the IFR: " + repid);
+    }
+
+    CORBA::InterfaceDef_var interface_def = CORBA::InterfaceDef::_narrow(contained.in());
+    if (CORBA::is_nil(interface_def.in())) {
+        throw std::runtime_error("The Interface found was not a InterfaceDef");
+    }
+
+    CORBA::InterfaceDef::FullInterfaceDescription_var interface = 
+        interface_def->describe_interface();
+
+    return getInteface(interface);
+}
+ 
+const InterfaceInfo& IfrClient::describeInterface(const std::string& repid) {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+ 
+    auto it = interface_cache_.find(repid);
+    if (it != interface_cache_.end()) return it->second;
+ 
+    InterfaceInfo info = fetchFromIfr(repid);
+    populateCache(info);
+    auto result = interface_cache_.emplace(repid, std::move(info));
+    return result.first->second;
+}
+ 
+CORBA::TypeCode_ptr IfrClient::returnTypeCode(const std::string& repid,
+                                              const std::string& method) const {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+    const std::string key = cacheKey(repid, method);
+    auto it = tc_cache_.find(key);
+    if (it == tc_cache_.end())
+        throw std::out_of_range("IfrClient: no TypeCode for " + key);
+    return it->second.in();
+}
+ 
+void IfrClient::preloadAll() {
+    CORBA::ContainedSeq_var contents =
+        repository_->contents(CORBA::dk_Interface, true);
+ 
+    std::cout << "[IfrClient] preloading " << contents->length()
+              << " interfaces..." << std::endl;
+ 
+    for (CORBA::ULong i = 0; i < contents->length(); ++i) {
+        try {
+            describeInterface(std::string(contents[i]->id()));
+        } catch (const std::exception& e) {
+            std::cerr << "[IfrClient] preload warning: " << e.what() << std::endl;
+        }
+    }
+ 
+    std::cout << "[IfrClient] preload complete ("
+              << tc_cache_.size() << " TypeCodes cached)" << std::endl;
+}
+
+void IfrClient::populateCache(const InterfaceInfo& info) {
+    for (const auto& op : info.operations)
+        tc_cache_[cacheKey(info.repid, op.name)] = 
+            CORBA::TypeCode::_duplicate(op.return_tc.in());
 }

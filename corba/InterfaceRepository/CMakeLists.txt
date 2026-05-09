@@ -1,27 +1,18 @@
-cmake_minimum_required(VERSION 3.10)
-project(ifr_connect CXX)
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(ACE_ROOT $ENV{ACE_ROOT})
-set(TAO_ROOT $ENV{TAO_ROOT})
-
-include_directories(
-    ${ACE_ROOT}
-    ${TAO_ROOT}
-    ${TAO_ROOT}/orbsvcs
+add_library(lib_ifr_client STATIC
+    ifr_connect.cpp
 )
-
-link_directories(
-    ${ACE_ROOT}/lib
+ 
+target_include_directories(lib_ifr_client PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    $ENV{ACE_ROOT}
+    $ENV{TAO_ROOT}
+    $ENV{TAO_ROOT}/orbsvcs
 )
-
-add_executable(ifr_data ifr_connect.cpp)
-
-target_link_libraries(ifr_data
+ 
+link_directories($ENV{ACE_ROOT}/lib)
+ 
+target_link_libraries(lib_ifr_client PUBLIC
     TAO_IFR_Client
-    TAO_CosNaming
     TAO_AnyTypeCode
     TAO
     ACE
