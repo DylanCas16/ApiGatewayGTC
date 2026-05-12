@@ -11,12 +11,12 @@ struct OperationInfo {
     std::string name;
     CORBA::TypeCode_var return_tc;
     CORBA::ParDescriptionSeq params;
-}
+};
 
 struct InterfaceInfo {
     std::string repid;
     std::vector<OperationInfo> operations;
-}
+};
 
 class IfrClient {
     public:
@@ -49,4 +49,4 @@ class IfrClient {
         InterfaceInfo fetchFromIfr(const std::string& repid);
         
         void populateCache(const InterfaceInfo& info);
-}
+};

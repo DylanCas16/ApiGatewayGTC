@@ -38,16 +38,14 @@ NsResolver::NsResolver(CORBA::ORB_ptr orb) : orb_(CORBA::ORB::_duplicate(orb)) {
 void NsResolver::connect() {
     std::cout << "[NsResolver] connecting to " << gcs_env::NS_URL << std::endl;
 
-    CORBA::Object_var obj = orb->string_to_object(gcs_env::NS_URL);
+    CORBA::Object_var obj = orb_->string_to_object(gcs_env::NS_URL);
     if (CORBA::is_nil(obj.in())) {
-        std::cerr << "Could not resolve NameService" << std::endl;
-        return 1;
+        throw std::runtime_error("Could not resolve NameService");
     }
 
     root_ = CosNaming::NamingContext::_narrow(obj.in());
-    if (CORBA::is_nil(root.in())) {
-        std::cerr << "Reference is not a NamingContext" << std::endl;
-        return 1;
+    if (CORBA::is_nil(root_.in())) {
+        throw std::runtime_error("Reference is not a NamingContext");
     }
 
     std::cout << "[NsResolver] connected" << std::endl;

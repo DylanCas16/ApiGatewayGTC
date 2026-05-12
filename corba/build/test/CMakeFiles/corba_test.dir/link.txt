@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/corba_test.dir/main.cpp.o  -o corba_test  ../liblib_corba_runtime.a ../NamingService/liblib_ns_resolver.a -lTAO_CosNaming ../InterfaceRepository/liblib_ifr_client.a -lTAO_IFR_Client -lTAO_AnyTypeCode -lTAO -lTAO_PortableServer -lACE 

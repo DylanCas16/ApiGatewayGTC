@@ -18,11 +18,31 @@ class OrbThread : public ACE_Task_Base {
         }
     private:
         CORBA::ORB_var orb_;
-}
+};
 
 class CorbaRuntime {
     public:
         CorbaRuntime() = default;
         ~CorbaRuntime() = default;
 
-}
+        CorbaRuntime(const CorbaRuntime&);
+        CorbaRuntime& operator = (const CorbaRuntime&);
+
+        void init();
+
+        void runInBackground();
+
+        void stop();
+
+        CORBA::ORB_ptr orb() const { return orb_.in(); }
+        PortableServer::POA_ptr rootPoa() const { return root_poa_.in(); }
+        NsResolver& ns() const { return *ns_resolver_; }
+        IfrClient& ifr() const { return *ifr_client_; }
+
+    private:
+        CORBA::ORB_var orb_;
+        PortableServer::POA_var root_poa_;
+        std::unique_ptr<OrbThread> orb_thread_;
+        std::unique_ptr<NsResolver> ns_resolver_;
+        std::unique_ptr<IfrClient> ifr_client_;
+};

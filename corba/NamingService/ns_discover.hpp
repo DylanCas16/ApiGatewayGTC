@@ -25,4 +25,4 @@ class NsResolver {
 
         static CosNaming::Name buildName(const std::string& path,
                                             const std::string& leaf_kind);
-}
+};

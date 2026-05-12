@@ -1,4 +1,4 @@
-#include "ifr_client.h"
+#include "ifr_connect.hpp"
 #include "../gcs_endpoints.h"
 
 #include <iostream>
@@ -62,7 +62,7 @@ InterfaceInfo IfrClient::fetchFromIfr(const std::string& repid) {
     CORBA::InterfaceDef::FullInterfaceDescription_var interface = 
         interface_def->describe_interface();
 
-    return getInteface(interface);
+    return getInterface(repid, interface);
 }
  
 const InterfaceInfo& IfrClient::describeInterface(const std::string& repid) {

@@ -1,0 +1,12 @@
+/home/gcsdev/final_gateway/corba/build/CMakeFiles/rebuild_cache.dir
+/home/gcsdev/final_gateway/corba/build/CMakeFiles/edit_cache.dir
+/home/gcsdev/final_gateway/corba/build/CMakeFiles/lib_corba_runtime.dir
+/home/gcsdev/final_gateway/corba/build/NamingService/CMakeFiles/rebuild_cache.dir
+/home/gcsdev/final_gateway/corba/build/NamingService/CMakeFiles/edit_cache.dir
+/home/gcsdev/final_gateway/corba/build/NamingService/CMakeFiles/lib_ns_resolver.dir
+/home/gcsdev/final_gateway/corba/build/InterfaceRepository/CMakeFiles/rebuild_cache.dir
+/home/gcsdev/final_gateway/corba/build/InterfaceRepository/CMakeFiles/edit_cache.dir
+/home/gcsdev/final_gateway/corba/build/InterfaceRepository/CMakeFiles/lib_ifr_client.dir
+/home/gcsdev/final_gateway/corba/build/test/CMakeFiles/rebuild_cache.dir
+/home/gcsdev/final_gateway/corba/build/test/CMakeFiles/edit_cache.dir
+/home/gcsdev/final_gateway/corba/build/test/CMakeFiles/corba_test.dir
