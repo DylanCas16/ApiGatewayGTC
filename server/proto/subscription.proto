@@ -1,0 +1,122 @@
+syntax = "proto3";
+package gateway;
+
+
+// Auxiliar
+enum AlarmState { 
+    STATE_DOESNT_CARE = 0;
+    ACTIVE_NACKED     = 1;
+    ACTIVE_ACKED      = 2;
+    INACTIVE_NACKED   = 3;
+    INACTIVE_ACKED    = 4;
+    SOLVED            = 5;
+    ACK               = 6;
+}
+
+enum AlarmSeverity {
+    SEVERITY_DOESNT_CARE = 0;
+    LEVEL1               = 1;
+    LEVEL2               = 2;
+    LEVEL3               = 3;
+    LEVEL4               = 4;
+    LEVEL5               = 5;
+}
+
+enum MessageType {
+    LOG_DOESNT_CARE = 0;
+    DEBUG           = 1;
+    INFO            = 2;
+    ERROR_TYPE      = 3;
+}
+
+enum MonitorType {
+    Unknown          = 0;
+    DataBlocks       = 1;
+    StateChanges     = 2;
+    MagnitudeChanges = 3;
+}
+
+message MultiType {
+    int64 time_stamp = 1;
+    oneof value {
+        double double_val = 2;
+        float  float_val  = 3;
+        int32  long_val   = 4;
+        int32  short_val  = 5;
+        int32  octet_val  = 6;
+    }
+}
+
+message DataBlockEvent {
+    int64 id = 1;
+    string component_name = 2;
+    string magnitude = 3;
+    int64 time_stamp = 4;
+    repeated MultiType samples = 5;
+}
+
+message StateChangeEvent {
+    string component_name = 1;
+    int64  time_stamp = 2;
+    string new_state = 3;
+}
+
+message MagnitudeChangeEvent {
+    string component_name = 1;
+    string magnitude = 2;
+    int64  time_stamp = 3;
+    int32  new_value = 4;
+}
+
+message TimeInterval {
+    int64 begin = 1;
+    int64 end = 2;
+}
+
+// Stream subscription functions
+message MonitorReq {
+    string component_name = 1;
+    string topic = 2;
+    MonitorType type = 3;
+}
+
+message MonitorEvent {
+    oneof event {
+        DataBlockEvent data_block = 1;
+        StateChangeEvent state_change = 2;
+        MagnitudeChangeEvent magnitude_change = 3;
+    }
+}
+
+message AlarmReq {
+    string alarm_name = 1;
+    string component_name = 2;
+    AlarmState state = 3;
+    AlarmSeverity severity = 4;
+}
+
+message AlarmEvent {
+    string alarm_name = 1;
+    string component_name = 2;
+    AlarmState state = 3;
+    AlarmSeverity severity = 4;
+    string description = 5;
+    int64 time_stamp = 6;
+    int64 id = 7;
+}
+
+message LogReq {
+    string component_name = 1;
+    int64 host_ip_address = 2;
+    MessageType type = 3;
+    TimeInterval time_stamp_range = 4;
+}
+
+message LogEvent {
+    string component_name = 1;
+    int64 host_ip_address = 2;
+    string source_code = 3;
+    MessageType type = 4;
+    int64 time_stamp = 5;
+    string msg_data = 6;
+}

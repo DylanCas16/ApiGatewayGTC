@@ -1,0 +1,46 @@
+syntax = "proto3";
+package gateway;
+
+
+// Auxiliar
+message Property {
+    string name = 1;
+    oneof value {
+        float  float_val    = 2;
+        double double_val   = 3;
+        int32  short_val    = 4;
+        int64  long_val     = 5;
+        bool   bool_val     = 6;
+        uint32 octet_val    = 7;
+        string string_val   = 8;
+        int64  time_val     = 9;
+    }
+}
+
+// Unary ConfigManager functions
+message GetPropRequest {
+    string property_name = 1;
+}
+
+message PropertyValue {
+    Property property = 1;
+}
+
+message SetPropRequest {
+    Property property = 1;
+}
+
+message SetPropResponse {
+    bool done = 1;
+}
+
+// Stream ConfigManager functions
+message ConfigReq {
+    string component_name = 1;
+}
+
+message ConfigEvent {
+    string component_name = 1;
+    string property_name = 2;
+    int64 time_stamp = 3;
+}
