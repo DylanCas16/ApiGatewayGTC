@@ -101,18 +101,19 @@ flowchart TD
         LogManager
     end
 
-CORBA_Runtime --Starts/Shutdown services for the clients---> UnaryInterface & StreamInterface
+CORBA_Runtime --Starts/Shutdown services for the clients--> UnaryInterface
+CORBA_Runtime --Starts/Shutdown services for the clients---> StreamInterface
 
+ClientA <--Send a request and get a unary response using a single thread--> UnaryInterface 
+ClientB --Send a request to make a subscription with a thread (waits until disconnection)--> StreamInterface
 
-ClientA <--Send a request and get a unary response using a single thread---> UnaryInterface 
-ClientB <--Send a request to make a subscription with a thread---> StreamInterface
-
-StreamInterface <--Obtain the consumer object for the subscription--> CorbaServant
-StreamInterface <--Get the subscription token with the consumer object or cancel the subscription--> MonitorPropagator
+StreamInterface <--1. Obtain the consumer object for the subscription--> CorbaServant
+StreamInterface <--2. Get the subscription token with the consumer object or cancel the subscription--> MonitorPropagator
 
 MonitorPropagator <--Call the interface to subscribe/unsubscribe and get the token--> gcs-env
 
-StreamInterface --Register or unregister the subscription with the token--> SubscriptionRegistry
+StreamInterface --3. Register or unregister the subscription with the token--> SubscriptionRegistry
 
-gcs-env --Push new data--> SubscriptionRegistry
-SubscriptionRegistry --Send new data when it is available---> ClientB
+gcs-env --Push new data--> CorbaServant
+CorbaServant --Send all data to convert and filter by clients--> SubscriptionRegistry
+SubscriptionRegistry --Send new data converted to each client and check connectivity--> ClientB

@@ -72,11 +72,16 @@ start --> gRPC_server
 gRPC_server --> CorbaRuntime
 CorbaRuntime --ListNaming()--> NS
 CorbaRuntime --Resolve()--> IFR
+IFR <--Get device ID--> NS
 CorbaRuntime --Invoke()--> DII
-CorbaRuntime --Get/SetProperty()--> Config
+DII <--Get device ID--> NS
+DII <--Get device interface--> IFR
+CorbaRuntime --Get/SetProperty()----> Config
+Config <--Access to get/set properties--> ConfigManager
 CorbaRuntime --All subscriptions--> SubscriptionManager
 SubscriptionManager <--Obtain Consumer Object to subscribe--> CorbaServant
 SubscriptionManager --Register/Unregister subscription with token--> SubscriptionRegistry
 SubscriptionManager <--subscribe()/unsubscribe() with Consumer object--> SubscriptionPropagator
+CorbaServant --Send new data when is avaliable to convert and filter by client--> SubscriptionRegistry
 SubscriptionRegistry <--Convert to/from CORBA Objects for subscription--> TypeAdapter
 DII <--Convert to/from CORBA Objects for subscription--> TypeAdapter
