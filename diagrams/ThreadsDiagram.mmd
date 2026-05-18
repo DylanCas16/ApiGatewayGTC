@@ -1,0 +1,118 @@
+flowchart TD
+    ClientA["`
+            Client_A
+            (Unary request)
+            `"]
+    ClientB["`
+            Client_B
+            (Stream request)
+            `"]
+
+    subgraph CORBA_Runtime
+        Start["`
+            **Startup**
+            1. Init ORB
+            2. Resolve RootPOA
+            3. Activate POAManager
+            `"]
+
+        Shutdown["`
+                **Shutdown**
+                1. Stop ORB
+                2. Wait for all threads to finish
+                3. Destroy ORB
+                `"]
+    end
+
+    subgraph UnaryInterface
+        NS
+        IFR
+        DII
+        Config
+    end
+
+    subgraph StreamInterface
+        SubscribeToMonitor
+        SubscribeToAlarms
+        SubscribeToLogs
+        SubscribeToConfig
+    end
+
+    subgraph SubscriptionRegistry
+        Mutex["`
+        Require a mutex
+        for all functions
+        `"]
+
+        addEntry["`
+                **addEntry()**
+                SubscriptionManager
+                registers the new
+                subscription with its token
+                `"]
+        
+        removeEntry["`
+                    **removeEntry()**
+                    SubscriptionManager
+                    unregisters using the
+                    token when the client
+                    ends connection (thread)
+                    `"]
+        
+        getData["`
+                **dispatch()**
+                A shared thread for the
+                subscription type receive
+                new data and with a mutex
+                send it to target clients
+                `"]
+    end
+
+    subgraph CorbaServant
+        getConsumer["`
+                    **getConsumerObject()**
+                    Returns the consumer
+                    objectby the interface
+                    requested
+                    `"]
+    end
+
+    subgraph MonitorPropagator
+        subscribe["`
+                **subscribeToXXXX()**
+                Calls the function
+                requested in gcs-env
+                for the subscription
+                to get the token
+                `"]
+        
+        unsubscribe["`
+                **unsubscribeToXXXX()**
+                Calls the function
+                requested in gcs-env
+                to cancel the subscription
+                `"]
+    end
+
+    subgraph gcs-env
+        MonitorManager
+        ConfigManager
+        AlarmManager
+        LogManager
+    end
+
+CORBA_Runtime --Starts/Shutdown services for the clients---> UnaryInterface & StreamInterface
+
+
+ClientA <--Send a request and get a unary response using a single thread---> UnaryInterface 
+ClientB <--Send a request to make a subscription with a thread---> StreamInterface
+
+StreamInterface <--Obtain the consumer object for the subscription--> CorbaServant
+StreamInterface <--Get the subscription token with the consumer object or cancel the subscription--> MonitorPropagator
+
+MonitorPropagator <--Call the interface to subscribe/unsubscribe and get the token--> gcs-env
+
+StreamInterface --Register or unregister the subscription with the token--> SubscriptionRegistry
+
+gcs-env --Push new data--> SubscriptionRegistry
+SubscriptionRegistry --Send new data when it is available---> ClientB

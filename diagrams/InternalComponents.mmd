@@ -1,0 +1,82 @@
+flowchart TD
+
+start((API Client))
+
+subgraph gRPC_server
+    unary["`
+            **Unary**
+            ListNaming()
+            Resolve()
+            Invoke()
+            `"]
+            
+    config["`
+            **Config**
+            GetProperty()
+            SetProperty()
+            SubscribeConfig()
+            `"]
+    
+    subscription["`
+            **Subscription**
+            SubscribeAlarms()
+            SubscribeLogs()
+            SubscribeMonitor()
+            `"]
+end
+
+subgraph "UnaryManager"
+    NS
+    IFR
+    DII
+    Config
+end
+
+subgraph SubscriptionManager
+    ConfigManager
+    AlarmManager
+    LogManager
+    MonitorManager
+end
+
+subgraph CorbaServant
+    AlarmConsumer
+    ConfigConsumer
+    MonitorConsumer
+    LogConsumer
+end
+
+subgraph TypeAdapter
+    LogAdapter
+    AlarmAdapter
+    MonitorAdapter
+    ConfigAdapter
+    AnyAdapter
+end
+
+subgraph SubscriptionRegistry
+    ConfigRegistry
+    AlarmRegistry
+    LogRegistry
+    MonitorRegistry
+end
+
+subgraph SubscriptionPropagator
+    ConfigPropagator
+    AlarmPropagator
+    LogPropagator
+    MonitorPropagator
+end
+
+start --> gRPC_server
+gRPC_server --> CorbaRuntime
+CorbaRuntime --ListNaming()--> NS
+CorbaRuntime --Resolve()--> IFR
+CorbaRuntime --Invoke()--> DII
+CorbaRuntime --Get/SetProperty()--> Config
+CorbaRuntime --All subscriptions--> SubscriptionManager
+SubscriptionManager <--Obtain Consumer Object to subscribe--> CorbaServant
+SubscriptionManager --Register/Unregister subscription with token--> SubscriptionRegistry
+SubscriptionManager <--subscribe()/unsubscribe() with Consumer object--> SubscriptionPropagator
+SubscriptionRegistry <--Convert to/from CORBA Objects for subscription--> TypeAdapter
+DII <--Convert to/from CORBA Objects for subscription--> TypeAdapter
