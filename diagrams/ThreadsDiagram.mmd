@@ -1,23 +1,23 @@
 flowchart TD
-    ClientA["`
+    ClientA{"`
             Client_A
             (Unary request)
-            `"]
-    ClientB["`
+            `"}
+    ClientB{"`
             Client_B
             (Stream request)
-            `"]
+            `"}
 
     subgraph CORBA_Runtime
         Start["`
-            **Startup**
+            **start()**
             1. Init ORB
             2. Resolve RootPOA
             3. Activate POAManager
             `"]
 
         Shutdown["`
-                **Shutdown**
+                **stop()**
                 1. Stop ORB
                 2. Wait for all threads to finish
                 3. Destroy ORB
@@ -25,10 +25,11 @@ flowchart TD
     end
 
     subgraph UnaryInterface
-        NS
-        IFR
-        DII
-        Config
+        ListNaming["`ListNaming()`"]
+        Resolve["`Resolve()`"]
+        Invoke["`Invoke()`"]
+        GetProperty["`GetProperty()`"]
+        SetProperty["`SetProperty()`"]
     end
 
     subgraph StreamInterface
@@ -75,6 +76,11 @@ flowchart TD
                     objectby the interface
                     requested
                     `"]
+        receive["`
+                **receiveXXXX()**
+                Listen to gcs-env
+                to get new data
+                `"]
     end
 
     subgraph MonitorPropagator
@@ -87,11 +93,34 @@ flowchart TD
                 `"]
         
         unsubscribe["`
-                **unsubscribeToXXXX()**
-                Calls the function
-                requested in gcs-env
-                to cancel the subscription
+                    **unsubscribeToXXXX()**
+                    Calls the function
+                    requested in gcs-env
+                    to cancel the subscription
+                    `"]
+    end
+
+    subgraph TypeAdapter
+        classes["`
+                **Adapter Classes:**
+                MonitorAdapter
+                LogAdapter
+                AlarmAdapter
+                ConfigAdapter
+                AnyValueAdapter
                 `"]
+
+        convertToCorba["`
+                        **convertToCorba()**
+                        Convert data from C++
+                        to each data type (class)
+                        `"]
+
+        convertFromCorba["`
+                        **convertFromCorba()**
+                        Convert data to C++
+                        from each data type (class)
+                        `"]
     end
 
     subgraph gcs-env
@@ -101,13 +130,14 @@ flowchart TD
         LogManager
     end
 
-CORBA_Runtime --Starts/Shutdown services for the clients--> UnaryInterface
-CORBA_Runtime --Starts/Shutdown services for the clients---> StreamInterface
+CORBA_Runtime --Start/Shutdown services for the clients--> UnaryInterface
+CORBA_Runtime --Start/Shutdown services for the clients---> StreamInterface
 
-ClientA <--Send a request and get a unary response using a single thread--> UnaryInterface 
+ClientA <--Send a request and get a response in a single thread--> UnaryInterface
+
 ClientB --Send a request to make a subscription with a thread (waits until disconnection)--> StreamInterface
 
-StreamInterface <--1. Obtain the consumer object for the subscription--> CorbaServant
+StreamInterface <--1. Obtain the consumer object--> CorbaServant
 StreamInterface <--2. Get the subscription token with the consumer object or cancel the subscription--> MonitorPropagator
 
 MonitorPropagator <--Call the interface to subscribe/unsubscribe and get the token--> gcs-env
@@ -115,5 +145,7 @@ MonitorPropagator <--Call the interface to subscribe/unsubscribe and get the tok
 StreamInterface --3. Register or unregister the subscription with the token--> SubscriptionRegistry
 
 gcs-env --Push new data--> CorbaServant
-CorbaServant --Send all data to convert and filter by clients--> SubscriptionRegistry
+CorbaServant <--Get consumer object-->gcs-env
+CorbaServant <--Convert data--> TypeAdapter
+CorbaServant --Send all data to filter by clients--> SubscriptionRegistry
 SubscriptionRegistry --Send new data converted to each client and check connectivity--> ClientB
