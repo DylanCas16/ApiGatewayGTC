@@ -1,9 +1,10 @@
 syntax = "proto3";
 package gateway;
 
-import "core.proto";
+import "adapter.proto";
+import "unary.proto";
 import "config.proto";
-import "subscription.proto";
+import "stream.proto";
 
 
 service GatewayServer {

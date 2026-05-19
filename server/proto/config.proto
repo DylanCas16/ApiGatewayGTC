@@ -5,16 +5,7 @@ package gateway;
 // Auxiliar
 message Property {
     string name = 1;
-    oneof value {
-        float  float_val    = 2;
-        double double_val   = 3;
-        int32  short_val    = 4;
-        int64  long_val     = 5;
-        bool   bool_val     = 6;
-        uint32 octet_val    = 7;
-        string string_val   = 8;
-        int64  time_val     = 9;
-    }
+    AnyValue value = 2;
 }
 
 // Unary ConfigManager functions

@@ -1,6 +1,8 @@
 syntax = "proto3";
 package gateway;
 
+import "adapter.proto";
+
 
 // Auxiliar
 enum AlarmState { 
@@ -22,6 +24,11 @@ enum AlarmSeverity {
     LEVEL5               = 5;
 }
 
+message TimeInterval {
+    int64 begin = 1;
+    int64 end = 2;
+}
+
 enum MessageType {
     LOG_DOESNT_CARE = 0;
     DEBUG           = 1;
@@ -36,23 +43,12 @@ enum MonitorType {
     MagnitudeChanges = 3;
 }
 
-message MultiType {
-    int64 time_stamp = 1;
-    oneof value {
-        double double_val = 2;
-        float  float_val  = 3;
-        int32  long_val   = 4;
-        int32  short_val  = 5;
-        int32  octet_val  = 6;
-    }
-}
-
 message DataBlockEvent {
     int64 id = 1;
     string component_name = 2;
     string magnitude = 3;
     int64 time_stamp = 4;
-    repeated MultiType samples = 5;
+    MultiTypeList samples = 5;
 }
 
 message StateChangeEvent {
@@ -66,11 +62,6 @@ message MagnitudeChangeEvent {
     string magnitude = 2;
     int64  time_stamp = 3;
     int32  new_value = 4;
-}
-
-message TimeInterval {
-    int64 begin = 1;
-    int64 end = 2;
 }
 
 // Stream subscription functions
@@ -107,14 +98,14 @@ message AlarmEvent {
 
 message LogReq {
     string component_name = 1;
-    int64 host_ip_address = 2;
+    int32 host_ip_address = 2;
     MessageType type = 3;
     TimeInterval time_stamp_range = 4;
 }
 
 message LogEvent {
     string component_name = 1;
-    int64 host_ip_address = 2;
+    int32 host_ip_address = 2;
     string source_code = 3;
     MessageType type = 4;
     int64 time_stamp = 5;
