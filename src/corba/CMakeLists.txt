@@ -7,10 +7,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
  
 set(ACE_ROOT $ENV{ACE_ROOT})
 set(TAO_ROOT $ENV{TAO_ROOT})
+set(ACE_LIB_DIR $ENV{ACE_ROOT}/lib)
 
 add_subdirectory(NamingService)
 add_subdirectory(InterfaceRepository)
-# add_subdirectory(DII)
+add_subdirectory(DII)
 
 add_library(lib_corba_runtime STATIC
     corba_runtime.cpp
@@ -26,7 +27,7 @@ target_include_directories(lib_corba_runtime PUBLIC
 target_link_libraries(lib_corba_runtime PUBLIC
     lib_ns_resolver
     lib_ifr_client
-    # lib_dii
+    lib_dii_invoke
     TAO_PortableServer
     ACE
 )

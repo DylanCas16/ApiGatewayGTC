@@ -9,8 +9,10 @@ target_include_directories(lib_ifr_client PUBLIC
     $ENV{TAO_ROOT}/orbsvcs
 )
  
-link_directories($ENV{ACE_ROOT}/lib)
- 
+target_link_directories(lib_ifr_client PUBLIC
+    ${ACE_LIB_DIR}
+)
+
 target_link_libraries(lib_ifr_client PUBLIC
     TAO_IFR_Client
     TAO_AnyTypeCode

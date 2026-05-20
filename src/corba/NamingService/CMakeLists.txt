@@ -9,7 +9,9 @@ target_include_directories(lib_ns_resolver PUBLIC
     $ENV{TAO_ROOT}/orbsvcs
 )
  
-link_directories($ENV{ACE_ROOT}/lib)
+target_link_directories(lib_ns_resolver PUBLIC
+    ${ACE_LIB_DIR}
+)
  
 target_link_libraries(lib_ns_resolver PUBLIC
     TAO_CosNaming

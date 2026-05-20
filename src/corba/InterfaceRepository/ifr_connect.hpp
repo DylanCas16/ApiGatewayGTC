@@ -1,22 +1,12 @@
 #pragma once
 
+#include "../corba_types.h"
 #include <tao/ORB.h>
 #include <tao/IFR_Client/IFR_BasicC.h>
 #include <string>
 #include <unordered_map>
 #include <mutex>
 
-
-struct OperationInfo {
-    std::string name;
-    CORBA::TypeCode_var return_tc;
-    CORBA::ParDescriptionSeq params;
-};
-
-struct InterfaceInfo {
-    std::string repid;
-    std::vector<OperationInfo> operations;
-};
 
 class IfrClient {
     public:

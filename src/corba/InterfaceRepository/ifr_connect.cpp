@@ -5,6 +5,18 @@
 #include <stdexcept>
 
 
+static ParamInfo toParamInfo(const CORBA::ParameterDescription& p) {
+    ParamInfo pi;
+    pi.name    = p.name.in();
+    pi.type_tc = CORBA::TypeCode::_duplicate(p.type.in());
+    switch (p.mode) {
+        case CORBA::PARAM_OUT:   pi.mode = ParamInfo::OUT;   break;
+        case CORBA::PARAM_INOUT: pi.mode = ParamInfo::INOUT; break;
+        default:                 pi.mode = ParamInfo::IN;    break;
+    }
+    return pi;
+}
+
 static InterfaceInfo getInterface(const std::string& repid,
             const CORBA::InterfaceDef::FullInterfaceDescription_var& interface) {
     
@@ -16,8 +28,12 @@ static InterfaceInfo getInterface(const std::string& repid,
         OperationInfo o_info;
         o_info.name      = op.name.in();
         o_info.return_tc = CORBA::TypeCode::_duplicate(op.result.in());
-        o_info.params    = op.parameters;
-        i_info.operations.push_back(std::move(o_info));
+        
+        for (CORBA::ULong p = 0; p < op.parameters.length(); ++p) {
+            o_info.params.push_back(toParamInfo(op.parameters[p]));
+        }
+
+        i_info.operations.push_back(o_info);
     }
 
     std::cout << "[IfrClient] described " << repid

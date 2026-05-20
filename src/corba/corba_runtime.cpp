@@ -1,6 +1,7 @@
 #include "corba_runtime.hpp"
 #include "NamingService/ns_discover.hpp"
 #include "InterfaceRepository/ifr_connect.hpp"
+#include "DII/dii_invocation.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -28,6 +29,8 @@ void CorbaRuntime::init() {
  
     ifr_client_ = std::unique_ptr<IfrClient>(new IfrClient(orb_.in()));
     ifr_client_->connect();
+
+    dii_engine_ = std::unique_ptr<DiiEngine>(new DiiEngine(orb_.in()));
  
     std::cout << "[CorbaRuntime] init OK" << std::endl;
 }
