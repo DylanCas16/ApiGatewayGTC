@@ -15,4 +15,5 @@ find_package(gRPC REQUIRED)
 find_package(Protobuf REQUIRED)
 
 add_subdirectory(corba)
+add_subdirectory(adapter)
 add_subdirectory(server)

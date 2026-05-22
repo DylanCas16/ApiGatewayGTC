@@ -8,6 +8,7 @@
 
 class NsResolver;
 class IfrClient;
+class DiiEngine;
 
 class OrbThread : public ACE_Task_Base {
     public:
@@ -38,6 +39,7 @@ class CorbaRuntime {
         PortableServer::POA_ptr rootPoa() const { return root_poa_.in(); }
         NsResolver& ns() const { return *ns_resolver_; }
         IfrClient& ifr() const { return *ifr_client_; }
+        DiiEngine& dii() const { return *dii_engine_; }
 
     private:
         CORBA::ORB_var orb_;
@@ -45,4 +47,5 @@ class CorbaRuntime {
         std::unique_ptr<OrbThread> orb_thread_;
         std::unique_ptr<NsResolver> ns_resolver_;
         std::unique_ptr<IfrClient> ifr_client_;
+        std::unique_ptr<DiiEngine> dii_engine_;
 };

@@ -1,6 +1,8 @@
 syntax = "proto3";
 package gateway;
 
+import "adapter.proto";
+
 
 // Auxiliar
 message Property {

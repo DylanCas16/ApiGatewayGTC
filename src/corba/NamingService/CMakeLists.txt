@@ -14,6 +14,7 @@ target_link_directories(lib_ns_resolver PUBLIC
 )
  
 target_link_libraries(lib_ns_resolver PUBLIC
+    lib_gcs_endpoints
     TAO_CosNaming
     TAO_AnyTypeCode
     TAO

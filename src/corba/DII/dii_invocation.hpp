@@ -33,6 +33,6 @@ class DiiEngine {
                         const std::vector<CORBA::Any>& args);
 
         std::vector<CORBA::Any> extractOutArgs(CORBA::Request_ptr request,
-                                                const std::string& method);
+                                                const std::vector<ParamInfo>& params);
 
 };

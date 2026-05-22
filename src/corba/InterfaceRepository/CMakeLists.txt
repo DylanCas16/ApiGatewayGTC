@@ -14,6 +14,7 @@ target_link_directories(lib_ifr_client PUBLIC
 )
 
 target_link_libraries(lib_ifr_client PUBLIC
+    lib_gcs_endpoints
     TAO_IFR_Client
     TAO_AnyTypeCode
     TAO

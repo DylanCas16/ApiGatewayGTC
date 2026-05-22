@@ -1,15 +1,16 @@
 #pragma once
 
 #include <tao/ORB.h>
+#include <tao/AnyTypeCode/TypeCode.h>
 #include <string>
 #include <vector>
 
 
 struct ParamInfo {
-    str::string name;
+    std::string name;
     CORBA::TypeCode_var tc;
     enum Mode { IN, OUT, INOUT } mode;
-}
+};
 
 struct OperationInfo {
     std::string name;

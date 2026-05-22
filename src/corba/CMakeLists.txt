@@ -4,7 +4,7 @@ project(gcs_corba CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
- 
+
 set(ACE_ROOT $ENV{ACE_ROOT})
 set(TAO_ROOT $ENV{TAO_ROOT})
 set(ACE_LIB_DIR $ENV{ACE_ROOT}/lib)
@@ -13,10 +13,18 @@ add_subdirectory(NamingService)
 add_subdirectory(InterfaceRepository)
 add_subdirectory(DII)
 
+add_library(lib_gcs_endpoints STATIC
+    gcs_endpoints.cpp
+)
+
+target_include_directories(lib_gcs_endpoints PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_library(lib_corba_runtime STATIC
     corba_runtime.cpp
 )
- 
+
 target_include_directories(lib_corba_runtime PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     $ENV{ACE_ROOT}

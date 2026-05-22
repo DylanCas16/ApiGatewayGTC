@@ -8,7 +8,7 @@
 static ParamInfo toParamInfo(const CORBA::ParameterDescription& p) {
     ParamInfo pi;
     pi.name    = p.name.in();
-    pi.type_tc = CORBA::TypeCode::_duplicate(p.type.in());
+    pi.tc = CORBA::TypeCode::_duplicate(p.type.in());
     switch (p.mode) {
         case CORBA::PARAM_OUT:   pi.mode = ParamInfo::OUT;   break;
         case CORBA::PARAM_INOUT: pi.mode = ParamInfo::INOUT; break;
