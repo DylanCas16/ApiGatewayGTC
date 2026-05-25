@@ -5,14 +5,23 @@ import "adapter.proto";
 
 
 // Auxiliar
-message Method {
-    string name = 1;
-    TypeKind resultTypeCode = 2;
+enum Mode {
+    UNSPECIFIED = 0;
+    IN = 1;
+    OUT = 2;
+    INOUT = 3;
 }
 
 message Param {
     string name = 1;
     TypeKind typeCode = 2;
+    Mode mode = 3;
+}
+
+message Method {
+    string name = 1;
+    TypeKind resultTypeCode = 2;
+    repeated Param params = 3;
 }
 
 message NamingEntry {
@@ -39,7 +48,6 @@ message ResolveRequest {
 message ComponentInfo {
     string component_name = 1;
     repeated Method methods = 2;
-    repeated Param params = 3;
 }
 
 message NamingRequest {}

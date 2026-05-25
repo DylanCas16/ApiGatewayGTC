@@ -6,6 +6,13 @@
 #include <vector>
 
 
+struct NsEntry {
+    std::string name;
+    std::string kind;
+    std::string ior;
+    bool is_context;
+};
+
 struct ParamInfo {
     std::string name;
     CORBA::TypeCode_var tc;

@@ -9,30 +9,6 @@
 #include <tao/IIOP_Profile.h>
 
 
-static void object_type(CORBA::Object_ptr target) {
-    try {
-        CORBA::String_var repo_id = target->_repository_id();
-        std::cout << "    type    : " << repo_id.in() << std::endl;
-    } catch (...) {
-        std::cout << "    type    : (not available)" << std::endl;
-    }
-}
-
-static void object_endpoint(CORBA::Object_ptr target) {
-    TAO_Stub* stub = target->_stubobj();
-    if (!stub) {
-        std::cout << "    endpoint: (stub not available)" << std::endl;
-        return;
-    }
-
-    TAO_MProfile& mp = stub->base_profiles();
-    for (CORBA::ULong p = 0; p < mp.profile_count(); ++p) {
-        TAO_Profile* profile = mp.get_profile(p);
-        CORBA::String_var str = profile->to_string();
-        std::cout << "    endpoint: " << str.in() << std::endl;
-    }
-}
-
 NsResolver::NsResolver(CORBA::ORB_ptr orb) : orb_(CORBA::ORB::_duplicate(orb)) {}
 
 void NsResolver::connect() {
@@ -86,27 +62,25 @@ CosNaming::Name NsResolver::buildName(const std::string& path,
     return name;
 }
 
-void NsResolver::listRoot(CORBA::ULong max_entries) const {
+std::vector<NsEntry> NsResolver::listRoot(CORBA::ULong max_entries) const {
+    std::vector<NsEntry> entries;
+
     if (CORBA::is_nil(root_.in())) {
         std::cerr << "[NsResolver] not connected" << std::endl;
-        return;
+        return entries;
     }
 
     CosNaming::BindingList_var bl;
     CosNaming::BindingIterator_var bi;
     root_->list(max_entries, bl.out(), bi.out());
-
-    std::cout << "Root bindings (" << bl->length() << "):" << std::endl;
     
     for (CORBA::ULong i = 0; i < bl->length(); ++i) {
         const CosNaming::Binding& b = bl[i];
-        const char* id   = b.binding_name[0].id.in();
-        const char* kind = b.binding_name[0].kind.in();
-        bool is_object = (b.binding_type == CosNaming::nobject);
 
-        std::cout << "  - " << id;
-        if (kind && *kind) std::cout << "." << kind;
-        std::cout << "  [" << (is_object ? "object" : "context") << "]" << std::endl;
+        NsEntry entry;
+        entry.name = b.binding_name[0].id.in();
+        entry.kind = b.binding_name[0].kind.in();
+        entry.is_context = (b.binding_type == CosNaming::nobject);
 
         try {
             CosNaming::Name name;
@@ -115,14 +89,15 @@ void NsResolver::listRoot(CORBA::ULong max_entries) const {
 
             CORBA::Object_var obj = root_->resolve(name);
 
-            if (is_object) {
-                object_type(obj.in());
-            }
-            object_endpoint(obj.in());
+            CORBA::String_var ior = orb_->object_to_string(obj.in());
+            entry.ior = ior.in();
             
         } catch (const CORBA::Exception& ex) {
             std::cout << "      ERROR: " << ex._name() << std::endl;
         }
-        std::cout << std::endl;
+        
+        entries.push_back(entry);
     }
+
+    return entries;
 }

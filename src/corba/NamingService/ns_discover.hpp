@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../corba_types.h"
 #include <tao/ORB.h>
 #include <orbsvcs/CosNamingC.h>
 #include <string>
@@ -15,7 +16,7 @@ class NsResolver {
         CORBA::Object_var resolve(const std::string& path,
                                     const std::string& leaf_kind = "") const;
 
-        void listRoot(CORBA::ULong max_entries = 32) const;
+        std::vector<NsEntry> listRoot(CORBA::ULong max_entries = 32) const;
 
         CosNaming::NamingContext_ptr root() const { return root_.in(); }
     

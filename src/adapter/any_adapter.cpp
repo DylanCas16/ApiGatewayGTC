@@ -6,11 +6,37 @@
 
 
 namespace AnyAdapter {
+    gateway::TypeKind AnyAdapter::toTypeKind(CORBA::TypeCode_ptr tc) {
+    if (!tc) return gateway::TYPE_UNKNOWN;
+    switch (tc->kind()) {
+        case CORBA::tk_double:  return gateway::TYPE_DOUBLE;
+        case CORBA::tk_float:   return gateway::TYPE_FLOAT;
+        case CORBA::tk_long:    return gateway::TYPE_LONG;
+        case CORBA::tk_short:   return gateway::TYPE_SHORT;
+        case CORBA::tk_boolean: return gateway::TYPE_BOOLEAN;
+        case CORBA::tk_octet:   return gateway::TYPE_OCTET;
+        case CORBA::tk_string:  return gateway::TYPE_STRING;
+        
+        case CORBA::tk_struct: {
+            const char* name = "";
+            try { name = tc->name(); }
+            catch (...) {}
+            
+            if (std::strcmp(name, "TimeValue") == 0) {
+                return gateway::TYPE_TIMEVALUE;
+            }
+            return gateway::TYPE_UNKNOWN;
+        }
+
+        default: return gateway::TYPE_UNKNOWN;
+    }
+}
+
     gateway::AnyValue fromCorba(const CORBA::Any& any, CORBA::TypeCode_ptr tc) {
         gateway::AnyValue dto;
+        dto.set_type_kind(toTypeKind(tc));
 
         if (!tc || tc->kind() == CORBA::tk_void) {
-            dto.set_type_kind(gateway::TYPE_UNKNOWN);
             return dto;
         }
 
@@ -18,7 +44,6 @@ namespace AnyAdapter {
             case CORBA::tk_double: {
                 CORBA::Double value = 0.0;
                 any >>= value;
-                dto.set_type_kind(gateway::TYPE_DOUBLE);
                 dto.set_double_val(value);
                 break;
             }
@@ -26,7 +51,6 @@ namespace AnyAdapter {
             case CORBA::tk_float: {
                 CORBA::Float value = 0.0f;
                 any >>= value;
-                dto.set_type_kind(gateway::TYPE_FLOAT);
                 dto.set_float_val(value);
                 break;
             }
@@ -34,7 +58,6 @@ namespace AnyAdapter {
             case CORBA::tk_long: {
                 CORBA::Long value = 0;
                 any >>= value;
-                dto.set_type_kind(gateway::TYPE_LONG);
                 dto.set_long_val(value);
                 break;
             }
@@ -42,7 +65,6 @@ namespace AnyAdapter {
             case CORBA::tk_short: {
                 CORBA::Short value = 0;
                 any >>= value;
-                dto.set_type_kind(gateway::TYPE_SHORT);
                 dto.set_short_val(value);
                 break;
             }
@@ -50,7 +72,6 @@ namespace AnyAdapter {
             case CORBA::tk_boolean: {
                 CORBA::Boolean value = false;
                 any >>= value;
-                dto.set_type_kind(gateway::TYPE_BOOLEAN);
                 dto.set_bool_val(value);
                 break;
             }
@@ -58,7 +79,6 @@ namespace AnyAdapter {
             case CORBA::tk_octet: {
                 CORBA::Octet value = 0;
                 any >>= value;
-                dto.set_type_kind(gateway::TYPE_OCTET);
                 dto.set_octet_val(value);
                 break;
             }
@@ -66,7 +86,6 @@ namespace AnyAdapter {
             case CORBA::tk_string: {
                 CORBA::String value = "";
                 any >>= value;
-                dto.set_type_kind(gateway::TYPE_STRING);
                 dto.set_string_val(value);
                 break;
             }
@@ -80,14 +99,12 @@ namespace AnyAdapter {
                     if (any >>= tv) {
                         int64_t packed = static_cast<int64_t>(tv.seconds) * 1000000000LL
                                     + static_cast<int64_t>(tv.nanoseconds);
-                        dto.set_type_kind(gateway::TYPE_TIMEVALUE);
                         dto.set_time_val(packed);
                     }
                 } else {
                     std::cerr << "[AnyAdapter] WARNING: struct not recognized: '"
                             << type_name << std::endl;
                     
-                    dto.set_type_kind(gateway::TYPE_UNKNOWN);
                     TAO_OutputCDR cdr;
                     cdr << any;
                     dto.set_raw_val(cdr.buffer(), cdr.length());
@@ -98,7 +115,6 @@ namespace AnyAdapter {
             default:
                 std::cerr << "[AnyAdapter] WARNING: TCKind=" << tc->kind()
                         << " not supported → raw_val" << std::endl;
-                dto.set_type_kind(gateway::TYPE_UNKNOWN);
                 TAO_OutputCDR cdr;
                 cdr << any;
                 dto.set_raw_val(cdr.buffer(), cdr.length());
