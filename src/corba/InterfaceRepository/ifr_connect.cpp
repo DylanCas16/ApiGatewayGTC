@@ -94,12 +94,21 @@ const InterfaceInfo& IfrClient::describeInterface(const std::string& repid) {
 }
  
 CORBA::TypeCode_ptr IfrClient::returnTypeCode(const std::string& repid,
-                                              const std::string& method) const {
+                                              const std::string& method) {
     std::lock_guard<std::mutex> lock(cache_mutex_);
     const std::string key = cacheKey(repid, method);
+
     auto it = tc_cache_.find(key);
+    if (it != tc_cache_.end()) return it->second.in();
+
+    InterfaceInfo info = fetchFromIfr(repid);
+    populateCache(info);
+    interface_cache_.emplace(repid, std::move(info));
+
+    it = tc_cache_.find(key);
     if (it == tc_cache_.end())
-        throw std::out_of_range("IfrClient: no TypeCode for " + key);
+        throw std::runtime_error("IfrClient: method not found in interface: " + key);
+
     return it->second.in();
 }
  

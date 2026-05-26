@@ -1,4 +1,4 @@
-cmake_minimum_version(VERSION 3.16)
+cmake_minimum_required(VERSION 3.17)
 project(gcs_api_gateway CXX)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -7,10 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
-
 find_package(MiddlewarePkg REQUIRED)
-find_package(ACE  REQUIRED)
-find_package(TAO  REQUIRED)
 find_package(gRPC REQUIRED)
 find_package(Protobuf REQUIRED)
 

@@ -10,6 +10,11 @@ target_include_directories(lib_gcs_endpoints PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+target_link_directories(lib_gcs_endpoints PUBLIC
+    ${ACE_ROOT}/lib
+    ${TAO_ROOT}/lib
+)
+
 add_library(lib_corba_runtime STATIC
     corba_runtime.cpp
 )
