@@ -1,10 +1,25 @@
 import sys
+sys.path.insert(0, "generated")
+
 import argparse
 import grpc
+import server_pb2_grpc
 import unary_pb2
 import unary_pb2_grpc
 import adapter_pb2
 
+
+def convert_to_adapter(value):
+    if isinstance(value, float):
+        return adapter_pb2.AnyValue(type_kind=adapter_pb2.TYPE_FLOAT, float_val=value)
+    elif isinstance(value, int):
+        return adapter_pb2.AnyValue(type_kind=adapter_pb2.TYPE_LONG, long_val=value)
+    elif isinstance(value, str):
+        return adapter_pb2.AnyValue(type_kind=adapter_pb2.TYPE_STRING, string_val=value)
+    elif isinstance(value, bool):
+        return adapter_pb2.AnyValue(type_kind=adapter_pb2.TYPE_BOOLEAN, bool_val=value)
+    else:
+        raise TypeError(f"Tipo no soportado: {type(value)}")
 
 def test_listnaming(stub):
     print("Starting ListNaming test...")
@@ -34,16 +49,15 @@ def test_resolve(stub, component_name):
         response = stub.Resolve(request)
         print(f"Resolve success ({len(response.methods)} methods found)")
 
-    for method in response.methods:
-        print(f"Name: {method.name} ")
-        print(f"Return TypeCode: {adapter_pb2.TypeKind.Name(method.resultTypeCode)}")
-        
-        print(f"Params:")
-        for param in method.params:
-            print(f"    - {unary_pb2.Mode.Name(param.mode)} {param.name}: 
-                    {adapter_pb2.TypeKind.Name(param.typeCode)}")
-        
-        print("")
+        for method in response.methods:
+            print(f"Name: {method.name} ")
+            print(f"Return TypeCode: {adapter_pb2.TypeKind.Name(method.resultTypeCode)}")
+            
+            print(f"Params:")
+            for param in method.params:
+                print(f"    - {unary_pb2.Mode.Name(param.mode)} {param.name}: {adapter_pb2.TypeKind.Name(param.typeCode)}")
+            
+            print("")
     except grpc.RpcError as error:
         print(f"Resolve test failed: ({error.code().name}) {error.details()}")
 
@@ -53,8 +67,11 @@ def test_invoke(stub, component_name, method_name, args=None):
     print("Starting Invoke test...")
 
     try:
+        anyvalue_args = [convert_to_adapter(arg) for arg in (args or [])]
         request = unary_pb2.InvokeRequest(component_name=component_name,
-                                            method_name=method_name, args=args or [])
+                                            method_name=method_name, 
+                                            args=anyvalue_args
+        )
         response = stub.Invoke(request)
         
         print(f"Invoke success ({method_name})")
@@ -69,12 +86,12 @@ def test_invoke(stub, component_name, method_name, args=None):
 
 def main():
     address = "localhost:50051"
-    component_name = "test/InspectorDevice_1"
+    component_name = "Test/InspectorDevice_1"
     
     print("Connecting to " + address)
 
     channel = grpc.insecure_channel(address)
-    stub = unary_pb2_grpc.GatewayStub(channel)
+    stub = server_pb2_grpc.GatewayServerStub(channel)
 
     try:
         grpc.channel_ready_future(channel).result(timeout=5)
@@ -96,11 +113,11 @@ def main():
     
     print("----------------------------------")
     
-    test_invoke(stub, component_name, "proccessFloat", [30.5])
+    test_invoke(stub, component_name, "processFloat", [30.5])
     
     print("----------------------------------")
     
-    test_invoke(stub, component_name, "proccessString", ["Hello World"])
+    test_invoke(stub, component_name, "processString", ["Hello World"])
 
     channel.close()
     return

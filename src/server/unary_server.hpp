@@ -7,7 +7,7 @@
 
 class Unary final : public gateway::GatewayServer::Service {
     public:
-        explicit GatewayServer(CorbaRuntime& corba) : corba_(corba) {}
+        explicit Unary(CorbaRuntime& corba) : corba_(corba) {}
 
         grpc::Status Invoke(
             grpc::ServerContext* context,
@@ -29,4 +29,4 @@ class Unary final : public gateway::GatewayServer::Service {
     
     private:
         CorbaRuntime& corba_;
-}  
+};  

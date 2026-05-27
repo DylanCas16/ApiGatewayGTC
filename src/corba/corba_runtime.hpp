@@ -1,5 +1,8 @@
 #pragma once
 
+#include "NamingService/ns_discover.hpp"
+#include "InterfaceRepository/ifr_connect.hpp"
+#include "DII/dii_invocation.hpp"
 #include <tao/ORB.h>
 #include <tao/PortableServer/PortableServer.h>
 #include <ace/Task.h>

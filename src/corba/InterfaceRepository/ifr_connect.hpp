@@ -17,7 +17,7 @@ class IfrClient {
         const InterfaceInfo& describeInterface(const std::string& repid);
         
         CORBA::TypeCode_ptr returnTypeCode(const std::string& repid, 
-                                            const std::string& method) const;
+                                            const std::string& method);
         
         void preloadAll();
         

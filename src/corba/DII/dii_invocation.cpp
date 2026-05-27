@@ -39,14 +39,14 @@ void DiiEngine::addInArgs(CORBA::Request_ptr request,
                           const std::vector<ParamInfo>& params,
                           const std::vector<CORBA::Any>& args) {
     if (args.empty()) return;
- 
-    size_t in_idx = 0;
+    
+    size_t index = 0;
     for (size_t p = 0; p < params.size(); ++p) {
         if (params[p].mode == ParamInfo::OUT) continue;
-        if (in_idx >= args.size()) break;
+        if (index >= args.size()) break;
  
         CORBA::Any& arg = request->add_in_arg(params[p].name.c_str());
-        arg = args[in_idx++];
+        arg = args[index++];
     }
 }
  
@@ -55,7 +55,8 @@ std::vector<CORBA::Any> DiiEngine::extractOutArgs(CORBA::Request_ptr request,
     std::vector<CORBA::Any> result;
     
     for (size_t p = 0; p < params.size(); ++p) {
-        if (params[p].mode == ParamInfo::IN) continue;
+        if (params[p].mode == ParamInfo::IN ||
+            params[p].mode == ParamInfo::UNSPECIFIED) continue;
  
         const CORBA::Any* val =
             request->arguments()->item(static_cast<CORBA::ULong>(p))->value();

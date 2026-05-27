@@ -16,7 +16,7 @@ struct NsEntry {
 struct ParamInfo {
     std::string name;
     CORBA::TypeCode_var tc;
-    enum Mode { IN, OUT, INOUT } mode;
+    enum Mode { IN, OUT, INOUT, UNSPECIFIED } mode;
 };
 
 struct OperationInfo {

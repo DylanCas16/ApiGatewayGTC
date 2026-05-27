@@ -1,4 +1,5 @@
-#include "server.hpp"
+#include "unary_server.hpp"
+#include "any_adapter.hpp"
 #include <vector>
 #include <string>
 
@@ -14,7 +15,7 @@ grpc::Status Unary::Invoke(
     CORBA::Object_var target = corba_.ns().resolve(component_name);
     const char* repid = target->_repository_id();
 
-    const InterfaceInfo info = corba_.ifr_client().describeInterface(repid);
+    const InterfaceInfo info = corba_.ifr().describeInterface(repid);
 
     const OperationInfo* op_info = nullptr;
     for (const OperationInfo& op : info.operations) {
@@ -25,7 +26,7 @@ grpc::Status Unary::Invoke(
         return grpc::Status(grpc::StatusCode::NOT_FOUND, "method not found: " + method_name);
     }
 
-    std::vector<CORBA::TypeCode_ptr> final_args;
+    std::vector<CORBA::Any> final_args;
 
     for (gateway::AnyValue arg : request->args()) {
         final_args.push_back(AnyAdapter::toCorba(arg));
@@ -33,7 +34,11 @@ grpc::Status Unary::Invoke(
 
     try {
         InvokeResult result = corba_.dii().invoke(
-            target.in(), method_name, op_info->params, final_args
+                                                target.in(), 
+                                                method_name, 
+                                                op_info->return_tc.in(), 
+                                                op_info->params, 
+                                                final_args
         );
 
         CORBA::TypeCode_var ret_tc = result.return_value.type();
@@ -66,7 +71,7 @@ grpc::Status Unary::Resolve(
     CORBA::Object_var target = corba_.ns().resolve(component_name);
     const char* repid = target->_repository_id();
 
-    InterfaceInfo interface = corba_.ifr().describeInterface(repid.in());
+    InterfaceInfo interface = corba_.ifr().describeInterface(repid);
 
     response->set_component_name(component_name);
 
@@ -91,7 +96,7 @@ grpc::Status Unary::ListNaming(
     const gateway::NamingRequest* request,
     gateway::NamingResponse* response) 
 {
-    std::vector<gateway::NamingEntry> entries = corba_.ns().listRoot();
+    std::vector<NsEntry> entries = corba_.ns().listRoot();
     
     for (const NsEntry& entry : entries) {
         gateway::NamingEntry* proto_entry = response->add_entries();
