@@ -117,7 +117,15 @@ def main():
     
     print("----------------------------------")
     
-    test_invoke(stub, component_name, "processString", ["Hello World"])
+    test_invoke(stub, component_name, "processDouble", [293.75])
+
+    print("----------------------------------")
+    
+    test_invoke(stub, component_name, "processShort", [5])
+
+    print("----------------------------------")
+    
+    test_invoke(stub, component_name, "processLong", [70])
 
     channel.close()
     return

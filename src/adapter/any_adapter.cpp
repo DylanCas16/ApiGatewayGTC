@@ -1,4 +1,6 @@
 #include "any_adapter.hpp"
+#include <tao/AnyTypeCode/Any_Unknown_IDL_Type.h>
+#include <tao/AnyTypeCode/TypeCode_Constants.h>
 #include <DGTC.h>
 #include <tao/CDR.h>
 #include <iostream>
@@ -156,8 +158,8 @@ namespace AnyAdapter {
             }
  
             case gateway::TYPE_STRING: {
-                const std::string& str = dto.string_val();
-                any <<= str.c_str();
+                const char* s = dto.string_val().c_str();
+                any <<= s;
                 break;
             }
  

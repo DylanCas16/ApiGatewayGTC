@@ -41,9 +41,9 @@ void DiiEngine::addInArgs(CORBA::Request_ptr request,
     if (args.empty()) return;
     
     size_t index = 0;
-    for (size_t p = 0; p < params.size(); ++p) {
-        if (params[p].mode == ParamInfo::OUT) continue;
+    for (size_t p = 0; p < params.size(); p++) {
         if (index >= args.size()) break;
+        if (params[p].mode == ParamInfo::OUT) continue;
  
         CORBA::Any& arg = request->add_in_arg(params[p].name.c_str());
         arg = args[index++];
