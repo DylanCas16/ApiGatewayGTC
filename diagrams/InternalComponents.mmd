@@ -28,7 +28,10 @@ end
 subgraph "UnaryManager"
     NS
     IFR
-    DII
+    DII["`
+        DII
+        DeviceDispatcher
+        `"]
     Config
 end
 
@@ -75,9 +78,10 @@ DII --Get interface--> IFR
 DII --Convert to/from CORBA Objects--> TypeAdapter
 CorbaRuntime --Resolve()--> IFR
 IFR --get device IOR--> NS
+IFR --Convert from CORBA Objects--> TypeAdapter
+CorbaRuntime --Get/SetProperty()--> Config
 CorbaRuntime --ListNaming()--> NS
-CorbaRuntime --Get/SetProperty()----> Config
-Config <--Access to get/set properties--> ConfigManager
+Config <--Access to get/set properties---> ConfigManager
 CorbaRuntime --All subscriptions--> SubscriptionManager
 SubscriptionManager --Register/Unregister subscription with token--> SubscriptionRegistry
 SubscriptionManager <--Obtain Consumer Object to subscribe--> CorbaServant
