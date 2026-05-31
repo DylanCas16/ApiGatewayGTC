@@ -6,15 +6,29 @@ La arquitectura de la Api Gateway se puede visualizar mediante dos diagramas pri
 
 ### Diagrama de componentes internos
 
-A continuación, se mostrará el diagrama que muestra la estructura interna de la Api Gateway, incluyendo sus comunicaciones y propósitos de estas.
+A continuación, se mostrará el diagrama que muestra la estructura interna de la Api Gateway, incluyendo sus comunicaciones y propósitos de estas. En este se muestra el flujo y conexiones que se pueden producir cuando un cliente (`Api Client`) accede a cualquiera de las funciones disponibles (`gRPC_server`). Estas funciones se pueden dividir en dos tipos: las funciones unarias, que solamente utilizarán un hilo para enviar una petición y devolverá el resultado de la función; y las server-stream, que iniciarán una suscripción a distintos dispositivos e irán recibiendo respuestas periódicas cuando estén disponibles, gestionado a través de suscripciones.
 
-<img width="3871" height="8192" alt="InternalDiagram" src="https://github.com/user-attachments/assets/0dbf2eb5-a9b9-45ad-85b9-dc2ee7c2abd8" />
+En primer lugar, las funciones unarias se dividen en cuatro clases: `NS`, que permitirán obtener el nombre e IOR de un dipositivo, lo cual es necesario no solo para `ListNaming()` sino para el resto de operaciones; `IFR`, que manejarán las interfaces de los dispositivos, pueden obtener todas las funciones y atributos que contenga este (`Resolve()`) y es útil para la función de invocación; `DII`, es la clase que realiza esta última tarea y su función es `Invoke()`, necesitando de las otras dos clases e incluso pudiendo servirse de un manejador auxiliar para la interfaz Device_ifce, que contiene una serie de funciones base que pueden agilizar la función sin necesidad de utilizar el propio DII de CORBA; por último, `Config`, se encarga de manejar las propiedades, ya sea para obtener alguna `GetProperty()` como para modificarla o añadirla `SetProperty()`. Esta última interfaz funciona aparte de del resto y necesita acceder a la interfaz de ConfigManager, como sugieren las flechas.
+
+Por otro lado, están las funciones de stream, que iniciarán las suscripciones para cada uno de los principales dispositivos. El procedimiento para realizar la suscripción siempre será el mismo, cambiando únicamente las interfaces a las que acceden y los nombres de sus operaciones.
+
+En primer lugar, el `Manager` debe obtener un consumidor, que obtiene de `gcs-env` para poder recibir los datos cuando estén disponibles. Este objeto lo obtiene del componente `CorbaServant`.
+A continuación, llama al componente `SubscriptionPropagator` para, con el consumidor, ejecutar la función de suscripción en `gcs-env`, devolviendo un ID de suscripción, o por el contrario cancelar esta.
+Finalmente, se llama al componente `SubscriptionRegistry` para registrar o eliminar la suscripción según proceda, recibiendo los datos de `CorbaServant`.
+
+Para finalizar, existe un componente llamado `TypeAdapter` que se encarga de realizar las conversiones de los tipos de variables, de CORBA a "gateway" y viceversa. Permitiendo así la comunicación gRPC-CORBA. Los componentes que necesitan este son: `IFR`, `DII` y `CorbaServant`; en el caso de IFR solamente para realizar la conversión de CORBA a gRPC, en el resto para ambos sentidos.
+
+<img width="4697" height="8192" alt="InternalDiagram" src="https://github.com/user-attachments/assets/6d0f1b68-98d9-4c05-890d-54210cfed765" />
 
 ### Diagrama de hilos de las conexiones
 
-Aquí se mostrará cómo se comunican los componentes a nivel de hilos, donde además se muestran los momentos donde se comunica con `gcs-env`.
+Aquí se mostrará cómo se comunican los componentes a nivel de hilos, donde además se muestran los momentos donde se comunica con `gcs-env`. Como se puede comprobar, el interruptor de todas las funciones y componentes parte de `corba_runtime`, este tiene la tarea de habilitar o deshabilitar el resto de componentes.
 
-<img width="3821" height="8192" alt="ThreadsDiagram" src="https://github.com/user-attachments/assets/9ba45ce4-e7d5-4588-8e57-a43c2dcaf3b8" />
+En el caso del cliente A, se puede ver como quiere ejecutar una función unaria. En este caso solamente se haría uso de un hilo que gestione tanto la petición como la respuesta, accediendo a los componentes que necesite y cerrando la conexión al finalizar.
+
+Por el contrario, el cliente B necesita de un hilo para iniciar la conexión, enviar la petición y esperar por las respuestas. No obstante, por detrás hay otro hilo que se encarga de ir obteniendo los objetos necesarios para iniciar la suscripción (`CorbaServant`, `SubscriptionPropagator` y `SubscriptionRegistry`), manteniendo otro hilo con `SubscriptionRegistry` para la llegada de los datos, que deberán llegar al cliente por el hilo inicial. En el caso de que se pierda la conexión mediante este último hilo con el cliente, automáticamente se cancelará esta suscripción y se ejecutarán una serie de funciones de limpieza para que no lleguen más datos si no es necesario.
+
+<img width="4648" height="8192" alt="ThreadsDiagram" src="https://github.com/user-attachments/assets/510373d2-e760-4d7a-977d-8818f63d0494" />
 
 
 ## Mapeo de tipos IDL <-> C++/Protobuf
