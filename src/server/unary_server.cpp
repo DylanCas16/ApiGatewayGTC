@@ -1,5 +1,6 @@
 #include "unary_server.hpp"
 #include "any_adapter.hpp"
+#include "../corba/DII/device_dispatcher.hpp"
 #include <vector>
 #include <string>
 
@@ -11,8 +12,39 @@ grpc::Status Unary::Invoke(
 {
     const std::string& component_name = request->component_name();
     const std::string& method_name = request->method_name();
+    
+    std::vector<CORBA::Any> final_args;
+    for (gateway::AnyValue arg : request->args()) {
+        final_args.push_back(AnyAdapter::toCorba(arg));
+    }
 
     CORBA::Object_var target = corba_.ns().resolve(component_name);
+
+    if (DeviceDispatcher::isDeviceMethod(method_name)) {
+        try {
+            std::unique_ptr<InvokeResult> device_result =
+                DeviceDispatcher::tryDispatch(target.in(), method_name, final_args);
+            if (device_result) {
+                CORBA::TypeCode_var return_tc = device_result->return_value.type();
+                
+                CORBA::TCKind kind = return_tc->kind();
+                if (kind != CORBA::tk_null && kind != CORBA::tk_void) {
+                    *response->mutable_return_value() =
+                        AnyAdapter::fromCorba(device_result->return_value, return_tc.in());
+                }
+
+                for (const CORBA::Any& out : device_result->out_args) {
+                    CORBA::TypeCode_var tc = out.type();
+                    *response->add_out_args() = AnyAdapter::fromCorba(out, tc.in());
+                }
+
+                return grpc::Status::OK;
+            }
+        } catch (const std::exception& exception) {
+            return grpc::Status(grpc::StatusCode::INTERNAL, exception.what());
+        }
+    }
+
     const char* repid = target->_repository_id();
 
     const InterfaceInfo info = corba_.ifr().describeInterface(repid);
@@ -24,12 +56,6 @@ grpc::Status Unary::Invoke(
     
     if (!op_info) {
         return grpc::Status(grpc::StatusCode::NOT_FOUND, "method not found: " + method_name);
-    }
-
-    std::vector<CORBA::Any> final_args;
-
-    for (gateway::AnyValue arg : request->args()) {
-        final_args.push_back(AnyAdapter::toCorba(arg));
     }
 
     try {

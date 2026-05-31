@@ -106,6 +106,14 @@ def main():
     print("----------------------------------")
     
     test_resolve(stub, component_name)
+
+    print("----------------------------------")
+    
+    test_invoke(stub, component_name, "start")
+
+    print("----------------------------------")
+    
+    test_invoke(stub, component_name, "init")
     
     print("----------------------------------")
     
@@ -117,7 +125,7 @@ def main():
     
     print("----------------------------------")
     
-    test_invoke(stub, component_name, "processDouble", [293.75])
+    test_invoke(stub, component_name, "processDouble", [293])
 
     print("----------------------------------")
     

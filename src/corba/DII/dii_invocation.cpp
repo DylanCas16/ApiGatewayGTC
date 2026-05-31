@@ -18,7 +18,6 @@ InvokeResult DiiEngine::invoke(CORBA::Object_ptr target,
     CORBA::Request_var request = target->_request(method.c_str());
     request->set_return_type(ret_tc);
     std::cout << "[DiiEngine] Operation " << method << " currently working" << std::endl;
-
     addInArgs(request.in(), params, args);
 
     try {
