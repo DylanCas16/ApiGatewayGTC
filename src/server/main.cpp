@@ -1,5 +1,6 @@
 #include "../corba/corba_runtime.hpp"
 #include "unary_server.hpp"
+// #include "stream_server.hpp"
 #include <grpcpp/grpcpp.h>
 
 int main() {
@@ -8,6 +9,7 @@ int main() {
     corba.runInBackground();
 
     Unary service(corba);
+    // Stream service(corba);
 
     grpc::ServerBuilder builder;
     builder.AddListeningPort("0.0.0.0:50051", grpc::InsecureServerCredentials());

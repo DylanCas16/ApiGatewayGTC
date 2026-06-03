@@ -2,6 +2,7 @@
 #include "NamingService/ns_discover.hpp"
 #include "InterfaceRepository/ifr_connect.hpp"
 #include "DII/dii_invocation.hpp"
+#include "gcs_endpoints.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -9,8 +10,11 @@
 
 
 void CorbaRuntime::init() {
-    int argc = 0;
-    orb_ = CORBA::ORB_init(argc, nullptr, "");
+    std::string endpoint = std::string("iiop://") + gcs_env::GCS_DEV_IP + ":0";
+    const char* orb_argv[] = { "ApiGatewayGTC", "-ORBListenEndpoints", endpoint.c_str() };
+    int argc = 3;
+    
+    orb_ = CORBA::ORB_init(argc, const_cast<char**>(orb_argv), "");
     if (CORBA::is_nil(orb_.in())) {
         throw std::runtime_error("CorbaRuntime: ORB_init failed");
     }

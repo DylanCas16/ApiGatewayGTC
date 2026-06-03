@@ -75,6 +75,25 @@ target_include_directories(lib_idl_stubs PUBLIC
 )
 target_link_libraries(lib_idl_stubs PUBLIC TAO ACE)
 
+set(IDL_SKELETON_SOURCES "")
+foreach(IDL_FILE ${IDL_FILES})
+    get_filename_component(IDL_NAME ${IDL_FILE} NAME_WE)
+    list(APPEND IDL_SKELETON_SOURCES "${IDL_GEN_DIR}/${IDL_NAME}S.cpp")
+endforeach()
+ 
+add_library(lib_idl_skeletons STATIC ${IDL_SKELETON_SOURCES})
+add_dependencies(lib_idl_skeletons generate_idl_stubs)
+target_include_directories(lib_idl_skeletons PUBLIC
+    "${IDL_GEN_DIR}"
+    $ENV{ACE_ROOT}
+    $ENV{TAO_ROOT}
+    $ENV{TAO_ROOT}/orbsvcs
+)
+target_link_libraries(lib_idl_skeletons PUBLIC lib_idl_stubs TAO_PortableServer)
+
 add_subdirectory(corba)
 add_subdirectory(adapter)
 add_subdirectory(server)
+add_subdirectory(CorbaServant)
+add_subdirectory(SubscriptionRegistry)
+add_subdirectory(SubscriptionPropagator)
