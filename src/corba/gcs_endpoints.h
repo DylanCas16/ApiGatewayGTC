@@ -5,4 +5,5 @@ namespace gcs_env {
     extern const char* NS_URL;
     extern const char* IFR_URL;
     extern const char* GCS_DEV_IP;
+    extern const char* GCS_MONITOR_NAME;
 }
