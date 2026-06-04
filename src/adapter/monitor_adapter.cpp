@@ -91,3 +91,131 @@ gateway::MultiTypeList MonitorAdapter::fromMultiTypeList(const MM::MultiTypeList
 
     return out;
 }
+
+void MonitorAdapter::fillSampleList(gateway::SampleList* out, const MM::SampleDoubleList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::Sample* sample = out->add_samples();
+        sample->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        sample->set_double_val(in[i].value);
+    }
+}
+ 
+void MonitorAdapter::fillSampleList(gateway::SampleList* out, const MM::SampleFloatList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::Sample* sample = out->add_samples();
+        sample->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        sample->set_float_val(in[i].value);
+    }
+}
+ 
+void MonitorAdapter::fillSampleList(gateway::SampleList* out, const MM::SampleLongList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::Sample* sample = out->add_samples();
+        sample->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        sample->set_long_val(static_cast<int32_t>(in[i].value));
+    }
+}
+ 
+void MonitorAdapter::fillSampleList(gateway::SampleList* out, const MM::SampleShortList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::Sample* sample = out->add_samples();
+        sample->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        sample->set_short_val(static_cast<int32_t>(in[i].value));
+    }
+}
+ 
+void MonitorAdapter::fillSampleList(gateway::SampleList* out, const MM::SampleOctetList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::Sample* sample = out->add_samples();
+        sample->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        sample->set_octet_val(static_cast<uint32_t>(in[i].value));
+    }
+}
+
+void MonitorAdapter::fillSampleArrayList(gateway::SampleArrayList* out, const MM::SampleDoubleArrayList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::SampleArray* sample_array = out->add_samples();
+        sample_array->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        fillDoubleArray(sample_array->mutable_double_array(), in[i].value);
+    }
+}
+ 
+void MonitorAdapter::fillSampleArrayList(gateway::SampleArrayList* out, const MM::SampleFloatArrayList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::SampleArray* sample_array = out->add_samples();
+        sample_array->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        fillFloatArray(sample_array->mutable_float_array(), in[i].value);
+    }
+}
+ 
+void MonitorAdapter::fillSampleArrayList(gateway::SampleArrayList* out, const MM::SampleLongArrayList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::SampleArray* sample_array = out->add_samples();
+        sample_array->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        fillLongArray(sample_array->mutable_long_array(), in[i].value);
+    }
+}
+ 
+void MonitorAdapter::fillSampleArrayList(gateway::SampleArrayList* out, const MM::SampleShortArrayList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::SampleArray* sample_array = out->add_samples();
+        sample_array->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+        fillShortArray(sample_array->mutable_short_array(), in[i].value);
+    }
+}
+ 
+void MonitorAdapter::fillSampleArrayList(gateway::SampleArrayList* out, const MM::SampleOctetArrayList& in) {
+    for (CORBA::ULong i = 0; i < in.length(); ++i) {
+        gateway::SampleArray* sa = out->add_samples();
+        sample_array->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
+ 
+        const CORBA::Octet* buffer = in[i].value.data.get_buffer();
+        sample_array->set_octet_array(reinterpret_cast<const char*>(buffer),
+            static_cast<std::size_t>(in[i].value.data.length())
+        );
+    }
+}
+
+void MonitorAdapter::fillDoubleArray(gateway::DoubleArray* out, const DGT::DoubleArray& in) {
+    gateway::Dimension* dim = out->mutable_dimension();
+    
+    dim->set_rows(static_cast<uint32_t>(in.dimension.height));
+    dim->set_cols(static_cast<uint32_t>(in.dimension.width));
+    
+    for (CORBA::ULong j = 0; j < in.data.length(); ++j) {
+        out->add_data(in.data[j]);
+    }   
+}
+ 
+void MonitorAdapter::fillFloatArray(gateway::FloatArray* out, const DGT::FloatArray& in) {
+    gateway::Dimension* dim = out->mutable_dimension();
+    
+    dim->set_rows(static_cast<uint32_t>(in.dimension.height));
+    dim->set_cols(static_cast<uint32_t>(in.dimension.width));
+    
+    for (CORBA::ULong j = 0; j < in.data.length(); ++j) {
+        out->add_data(in.data[j]);
+    }
+}
+ 
+void MonitorAdapter::fillLongArray(gateway::LongArray* out, const DGT::LongArray& in) {
+    gateway::Dimension* dim = out->mutable_dimension();
+    
+    dim->set_rows(static_cast<uint32_t>(in.dimension.height));
+    dim->set_cols(static_cast<uint32_t>(in.dimension.width));
+    
+    for (CORBA::ULong j = 0; j < in.data.length(); ++j) {
+        out->add_data(static_cast<int32_t>(in.data[j]));
+    }
+}
+ 
+void MonitorAdapter::fillShortArray(gateway::ShortArray* out, const DGT::ShortArray& in) {
+    gateway::Dimension* dim = out->mutable_dimension();
+    
+    dim->set_rows(static_cast<uint32_t>(in.dimension.height));
+    dim->set_cols(static_cast<uint32_t>(in.dimension.width));
+    
+    for (CORBA::ULong j = 0; j < in.data.length(); ++j) {
+        out->add_data(static_cast<int32_t>(in.data[j]));
+    }
+}
