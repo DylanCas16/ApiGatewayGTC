@@ -59,12 +59,16 @@ target_sources(proto-objects PRIVATE ${GRPC_GENERATED_FILES})
 add_executable(gateway_server
     main.cpp
     unary_server.cpp
+    stream_server.cpp
 )
 
 target_include_directories(gateway_server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/corba
     ${CMAKE_SOURCE_DIR}/adapter
+    ${CMAKE_SOURCE_DIR}/CorbaServant
+    ${CMAKE_SOURCE_DIR}/SubscriptionPropagator
+    ${CMAKE_SOURCE_DIR}/SubscriptionRegistry
     ${PROTO_BINARY_DIR}
 )
 

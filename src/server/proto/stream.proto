@@ -66,9 +66,9 @@ message MagnitudeChangeEvent {
 
 // Stream subscription functions
 message MonitorReq {
-    string component_name = 1;
-    string topic = 2;
-    MonitorType type = 3;
+    MonitorType type = 1;
+    string component_name = 2;
+    string magnitude = 3;
 }
 
 message MonitorEvent {
