@@ -7,6 +7,7 @@
 #include <vector>
 #include <stdint.h>
 #include <grpcpp/grpcpp.h>
+#include <grpcpp/impl/codegen/sync_stream.h>
 
 
 template<typename T>
@@ -44,14 +45,14 @@ class SubscriptionRegistry {
         {
             std::lock_guard<std::mutex> lock(mutex_);
             
-            EntryMap::iterator iter = entries_.find(id);
+            typename EntryMap::iterator iter = entries_.find(id);
             if (iter == entries_.end()) return false;
 
             std::string key = iter->second.key;
             entries_.erase(iter);
 
-            for (EntryMap::const_iterator i = entries_.begin(); i != entries_.end(); ++i) {
-                if (i->second.active && j->second.key == key) {
+            for (typename EntryMap::const_iterator i = entries_.begin(); i != entries_.end(); ++i) {
+                if (i->second.active && i->second.key == key) {
                     return false;
                 }
             }
@@ -66,7 +67,7 @@ class SubscriptionRegistry {
 
             {
                 std::lock_guard<std::mutex> lock(mutex_);
-                for (EntryMap::iterator iter = entries_.begin(); iter != entries_.end(); ++iter) {
+                for (typename EntryMap::iterator iter = entries_.begin(); iter != entries_.end(); ++iter) {
                     Entry& entry = iter->second;
                     if (entry.active && entry.key == key) {
                         targets.push_back(std::make_pair(iter->first, entry.writer));
@@ -78,7 +79,7 @@ class SubscriptionRegistry {
             for (std::size_t i = 0; i<targets.size(); ++i) {
                 if (!targets[i].second->Write(response)) {
                     std::lock_guard<std::mutex> lock(mutex_);
-                    EntryMap::iterator iter = entries_.find(targets[i].first);
+                    typename EntryMap::iterator iter = entries_.find(targets[i].first);
                     
                     if (iter != entries_.end()) {
                         iter->second.active = false;
@@ -93,14 +94,14 @@ class SubscriptionRegistry {
         bool isActive(uint64_t id) const
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            EntryMap::const_iterator iter = entries_.find(id);
+            typename EntryMap::const_iterator iter = entries_.find(id);
             return iter != entries_.end() && iter->second.active;
         }
 
         bool hasActiveWriters(const std::string& key) const
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            for (EntryMap::const_iterator iter = entries_.begin(); iter != entries_.end(); ++iter) {
+            for (typename EntryMap::const_iterator iter = entries_.begin(); iter != entries_.end(); ++iter) {
                 if (iter->second.active && iter->second.key == key) return true;
             }
             return false;

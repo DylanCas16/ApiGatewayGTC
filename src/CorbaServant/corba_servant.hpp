@@ -4,7 +4,7 @@
 #include <tao/PortableServer/PortableServer.h>
 #include "MMCommonC.h"
 #include "monitor_consumer.hpp"
-#include "SubscriptionRegistry/subscription_registry.hpp"
+#include "../SubscriptionRegistry/subscription_registry.hpp"
 #include "stream.pb.h"
 
 

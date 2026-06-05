@@ -3,8 +3,8 @@
 #include <tao/corba.h>
 #include "MMCommonS.h"
 #include "MMCommonC.h"
-#include "adapter/monitor_adapter.hpp"
-#include "SubscriptionRegistry/subscription_registry.hpp"
+#include "../adapter/monitor_adapter.hpp"
+#include "../SubscriptionRegistry/subscription_registry.hpp"
 #include "stream.pb.h"
 
 

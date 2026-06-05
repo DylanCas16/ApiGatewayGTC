@@ -8,8 +8,8 @@
 #include "stream.pb.h"
  
 #include "corba_runtime.hpp"
-#include "CorbaServant/corba_servant.hpp"
-#include "SubscriptionPropagator/monitor_propagator.hpp"
+#include "../CorbaServant/corba_servant.hpp"
+#include "../SubscriptionPropagator/monitor_propagator.hpp"
 
 
 class Stream final : public gateway::GatewayServer::Service {
@@ -20,21 +20,21 @@ class Stream final : public gateway::GatewayServer::Service {
             monitor_propagator_(corba.ns(), monitor_registry_) 
         {}
         
-        grpc::Status MonitorManager(
+        grpc::Status SubscribeMonitor(
             grpc::ServerContext* context,
-            const grpc::MonitorReq* request,
+            const gateway::MonitorReq* request,
             grpc::ServerWriter<gateway::MonitorEvent>* writer
         ) override;
 
-        grpc::Status AlarmManager(
+        grpc::Status SubscribeAlarms(
             grpc::ServerContext* context,
-            const grpc::AlarmReq* request,
+            const gateway::AlarmReq* request,
             grpc::ServerWriter<gateway::AlarmEvent>* writer
         ) override;
 
-        grpc::Status LogManager(
+        grpc::Status SubscribeLogs(
             grpc::ServerContext* context,
-            const grpc::LogReq* request,
+            const gateway::LogReq* request,
             grpc::ServerWriter<gateway::LogEvent>* writer
         ) override;
     

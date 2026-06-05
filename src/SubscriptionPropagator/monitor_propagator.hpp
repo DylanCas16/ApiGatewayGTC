@@ -5,7 +5,8 @@
 #include <stdint.h>
 #include "MMCommonC.h"
 #include "MonitorManagerC.h"
-#include "SubscriptionRegistry/subscription_registry.hpp"
+#include "../SubscriptionRegistry/subscription_registry.hpp"
+#include "../corba/corba_runtime.hpp"
 #include "stream.pb.h"
 
 

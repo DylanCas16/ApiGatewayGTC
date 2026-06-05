@@ -1,6 +1,6 @@
 #include "monitor_propagator.hpp"
-#include "NamingService/ns_discover.hpp"
-#include "gcs_endpoints.h"
+#include "../corba/NamingService/ns_discover.hpp"
+#include "../corba/gcs_endpoints.h"
 #include <iostream>
 #include <stdexcept>
 
@@ -9,14 +9,14 @@ MonitorPropagator::MonitorPropagator(NsResolver& ns, Registry& registry) : ns_(n
 
 uint64_t MonitorPropagator::subscribe(const std::string& component, const std::string& magnitude,
                                         gateway::MonitorType type, MM::Consumer_ifce_ptr consumer,
-                                        grpc::ServerWriter<gateway::MonitorEvent>* event) 
+                                        grpc::ServerWriter<gateway::MonitorEvent>* writer) 
 {
     ensureConnected();
 
     std::string key;
-    switch (key) {
+    switch (type) {
         case gateway::DataBlocks:
-            key = Registry::dataBlocksKey(component, magnitude);
+            key = Registry::dataBlockKey(component, magnitude);
             break;
         
         case gateway::StateChanges:
@@ -53,7 +53,7 @@ void MonitorPropagator::unsubscribe(uint64_t id, const std::string& component, c
 
             std::cout << "[MonitorPropagator] CORBA unsubscribe: " << component << "/" << magnitude << std::endl;
         } catch (CORBA::Exception& exception) {
-            std::cerr << "[MonitorPropagator] CORBA unsubscribe failed: " << exception.name() << std::endl;
+            std::cerr << "[MonitorPropagator] CORBA unsubscribe failed: " << exception._name() << std::endl;
         }
     }
 }
@@ -62,12 +62,12 @@ void MonitorPropagator::ensureConnected() {
     if (isConnected()) return;
 
     CORBA::Object_var obj = ns_.resolve(gcs_env::GCS_MONITOR_NAME);
-    if (CORBA::is_nill(obj.in())) {
+    if (CORBA::is_nil(obj.in())) {
         throw std::runtime_error("[MonitorPropagator] MonitorManager Naming Service not found");
     }
 
     propagator_ = MM::MonitorPropagator_ifce::_narrow(obj.in());
-    if (CORBA::is_nill(propagator_.in())) {
+    if (CORBA::is_nil(propagator_.in())) {
         throw std::runtime_error("[MonitorPropagator] Narrow to MonitorPropagator_ifce failed");
     }
 

@@ -8,12 +8,11 @@ int main() {
     corba.init();
     corba.runInBackground();
 
-    Unary service(corba);
-    Stream service(corba);
+    Stream stream_service(corba);
 
     grpc::ServerBuilder builder;
     builder.AddListeningPort("0.0.0.0:50051", grpc::InsecureServerCredentials());
-    builder.RegisterService(&service);
+    builder.RegisterService(&stream_service);
     auto server = builder.BuildAndStart();
 
     server->Wait();

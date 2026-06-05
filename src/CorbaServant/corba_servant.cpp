@@ -24,14 +24,14 @@ CorbaServant::~CorbaServant() {
             poa_->deactivate_object(object_id);
         } catch (const CORBA::Exception& exception) {
             std::cerr << "[CorbaServant] deactivation (MonitorConsumer) failed: " 
-                << exception.name() << std::endl;
+                << exception._name() << std::endl;
         }
         delete monitor_consumer_impl_;
         monitor_consumer_impl_ = nullptr;
     }
 }
 
-MM::Consumer_ifce CorbaServant::getMonitorConsumerObject() const {
+MM::Consumer_ifce_ptr CorbaServant::getMonitorConsumerObject() const {
     return MM::Consumer_ifce::_duplicate(monitor_consumer_ref_.in());
 }
 

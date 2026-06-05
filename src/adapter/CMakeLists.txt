@@ -1,11 +1,11 @@
-add_library(lib_any_adapter STATIC 
+add_library(lib_adapter STATIC 
     any_adapter.cpp
     monitor_adapter.cpp
 )
 
-add_dependencies(lib_any_adapter generate_idl_stubs proto-objects)
+add_dependencies(lib_adapter generate_idl_stubs proto-objects)
 
-target_include_directories(lib_any_adapter PUBLIC
+target_include_directories(lib_adapter PUBLIC
     ${ACE_ROOT}/include
     ${TAO_ROOT}/include
     ${TAO_ROOT}/orbsvcs
@@ -13,12 +13,12 @@ target_include_directories(lib_any_adapter PUBLIC
     ${IDL_GEN_DIR}
 )
 
-target_link_directories(lib_any_adapter PUBLIC
+target_link_directories(lib_adapter PUBLIC
     ${ACE_ROOT}/lib
     ${TAO_ROOT}/lib
 )
 
-target_link_libraries(lib_any_adapter PUBLIC
+target_link_libraries(lib_adapter PUBLIC
     proto-objects
     lib_idl_stubs
     MiddlewarePkg::IL-DistributedKit-DGCSTypes-l-DGCSTypes

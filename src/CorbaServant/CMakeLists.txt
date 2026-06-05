@@ -1,19 +1,19 @@
 cmake_minimum_required(VERSION 3.17)
 
-add_library(servant STATIC
+add_library(CorbaServant STATIC
     monitor_consumer.cpp
     corba_servant.cpp
 )
 
-target_include_directories(servant PUBLIC
+target_include_directories(CorbaServant PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${IDL_GEN_DIR}
     ${CMAKE_BINARY_DIR}/generated/proto
 )
 
 target_link_libraries(CorbaServant PUBLIC
-    subscription
-    adapter
+    SubscriptionRegistry
+    lib_adapter
     lib_idl_stubs
     lib_idl_skeletons
     gRPC::grpc++

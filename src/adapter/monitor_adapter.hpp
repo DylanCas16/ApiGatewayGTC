@@ -1,15 +1,15 @@
 #pragma once
 
-#include <tao/orb.h>
+#include <tao/ORB.h>
 #include "MMCommonC.h"
-#include "DGTCommonC.h"
+#include "DGTC.h"
 #include "adapter.pb.h"
 #include "stream.pb.h"
 
 
 class MonitorAdapter {
     public:
-        static gateway::DataBlocksEvent 
+        static gateway::DataBlockEvent 
             fromDataBlock(const MM::DataBlock& data);
         
         static gateway::StateChangeEvent 
@@ -55,4 +55,4 @@ class MonitorAdapter {
         static void fillFloatArray(gateway::FloatArray* out, const DGT::FloatArray& in);
         static void fillLongArray(gateway::LongArray* out, const DGT::LongArray& in);
         static void fillShortArray(gateway::ShortArray* out, const DGT::ShortArray& in);
-}
+};

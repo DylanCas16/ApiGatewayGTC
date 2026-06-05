@@ -1,15 +1,17 @@
 #include "monitor_adapter.hpp"
+#include "stream.pb.h"
+#include "adapter.pb.h"
 #include <iostream>
 
 
-gateway::DataBlocksEvent MonitorAdapter::fromDataBlock(const MM::DataBlock& data) {
-    gateway::DataBlocksEvent event;
+gateway::DataBlockEvent MonitorAdapter::fromDataBlock(const MM::DataBlock& data) {
+    gateway::DataBlockEvent event;
     
     event.set_id(static_cast<int64_t>(data.id));
     event.set_component_name(data.gcs_component.in());
     event.set_magnitude(data.magnitude.in());
     event.set_time_stamp(static_cast<int64_t>(data.time_stamp.usec));
-    *event.mutable_samples(data.samples);
+    *event.mutable_samples() = MonitorAdapter::fromMultiTypeList(data.samples);
     
     return event;
 }
@@ -61,27 +63,27 @@ gateway::MultiTypeList MonitorAdapter::fromMultiTypeList(const MM::MultiTypeList
         
         case MM::TYPE_SAMPLE_DOUBLE_ARRAY1D_LIST:
         case MM::TYPE_SAMPLE_DOUBLE_ARRAY2D_LIST:
-            fillSampleArrayList(out.mutable_double_array_list(), list.array_d());
+            fillSampleArrayList(out.mutable_double_arraylist(), list.array_d());
             break;
         
         case MM::TYPE_SAMPLE_FLOAT_ARRAY1D_LIST:
         case MM::TYPE_SAMPLE_FLOAT_ARRAY2D_LIST:
-            fillSampleArrayList(out.mutable_float_array_list(), list.array_f());
+            fillSampleArrayList(out.mutable_float_arraylist(), list.array_f());
             break;
 
         case MM::TYPE_SAMPLE_LONG_ARRAY1D_LIST:
         case MM::TYPE_SAMPLE_LONG_ARRAY2D_LIST:
-            fillSampleArrayList(out.mutable_long_array_list(), list.array_l());
+            fillSampleArrayList(out.mutable_long_arraylist(), list.array_l());
             break;
 
         case MM::TYPE_SAMPLE_SHORT_ARRAY1D_LIST:
         case MM::TYPE_SAMPLE_SHORT_ARRAY2D_LIST:
-            fillSampleArrayList(out.mutable_short_array_list(), list.array_s());
+            fillSampleArrayList(out.mutable_short_arraylist(), list.array_s());
             break;
 
         case MM::TYPE_SAMPLE_OCTET_ARRAY1D_LIST:
         case MM::TYPE_SAMPLE_OCTET_ARRAY2D_LIST:
-            fillSampleArrayList(out.mutable_octet_array_list(), list.array_o());
+            fillSampleArrayList(out.mutable_octet_arraylist(), list.array_o());
             break;
         
         default:
@@ -166,7 +168,7 @@ void MonitorAdapter::fillSampleArrayList(gateway::SampleArrayList* out, const MM
  
 void MonitorAdapter::fillSampleArrayList(gateway::SampleArrayList* out, const MM::SampleOctetArrayList& in) {
     for (CORBA::ULong i = 0; i < in.length(); ++i) {
-        gateway::SampleArray* sa = out->add_samples();
+        gateway::SampleArray* sample_array = out->add_samples();
         sample_array->set_time_stamp(static_cast<int64_t>(in[i].time_stamp.usec));
  
         const CORBA::Octet* buffer = in[i].value.data.get_buffer();

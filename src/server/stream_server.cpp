@@ -1,21 +1,18 @@
 #include "stream_server.hpp"
-#include "monitor_adapter.hpp"
-#include "CorbaServant/corba_servant.hpp"
-#include "SubscriptionPropagator/monitor_propagator.hpp"
-#include <vector>
-#include <string>
-#include <stdio>
+#include <iostream>
+#include <thread>
+#include <chrono>
 
 
-grpc::Status Stream::MonitorManager(
+grpc::Status Stream::SubscribeMonitor(
     grpc::ServerContext* context,
-    const grpc::MonitorReq* request,
+    const gateway::MonitorReq* request,
     grpc::ServerWriter<gateway::MonitorEvent>* writer
 )
 {
     const std::string& component_name = request->component_name();
     const std::string& magnitude = request->magnitude();
-    gateway::MonitorType& type = request->type();
+    gateway::MonitorType type = request->type();
 
 
     MM::Consumer_ifce_var consumer = corba_servant_.getMonitorConsumerObject();
@@ -32,9 +29,9 @@ grpc::Status Stream::MonitorManager(
     return grpc::Status::OK;
 }
 
-grpc::Status Stream::AlarmManager(
+grpc::Status Stream::SubscribeAlarms(
     grpc::ServerContext* context,
-    const grpc::AlarmReq* request,
+    const gateway::AlarmReq* request,
     grpc::ServerWriter<gateway::AlarmEvent>* writer
 )
 {
@@ -42,9 +39,9 @@ grpc::Status Stream::AlarmManager(
     return grpc::Status::OK;
 }
 
-grpc::Status Stream::LogManager(
+grpc::Status Stream::SubscribeLogs(
     grpc::ServerContext* context,
-    const grpc::LogReq* request,
+    const gateway::LogReq* request,
     grpc::ServerWriter<gateway::LogEvent>* writer
 )
 {

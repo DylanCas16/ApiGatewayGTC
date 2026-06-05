@@ -74,7 +74,9 @@ target_include_directories(gateway_server PRIVATE
 
 target_link_libraries(gateway_server PRIVATE
     lib_corba_runtime
-    lib_any_adapter
+    lib_adapter
+    CorbaServant
+    SubscriptionPropagator
     proto-objects
     protobuf::libprotobuf
     gRPC::grpc++
