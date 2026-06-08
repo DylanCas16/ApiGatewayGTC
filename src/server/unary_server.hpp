@@ -5,7 +5,7 @@
 #include "corba_runtime.hpp"
 
 
-class Unary final : public gateway::GatewayServer::Service {
+class Unary {
     public:
         explicit Unary(CorbaRuntime& corba) : corba_(corba) {}
 
@@ -13,19 +13,19 @@ class Unary final : public gateway::GatewayServer::Service {
             grpc::ServerContext* context,
             const gateway::InvokeRequest* request,
             gateway::InvokeResponse* response
-        ) override;
+        );
 
         grpc::Status Resolve(
             grpc::ServerContext* context,
             const gateway::ResolveRequest* request,
             gateway::ComponentInfo* response
-        ) override;
+        );
 
         grpc::Status ListNaming(
             grpc::ServerContext* context,
             const gateway::NamingRequest* request,
             gateway::NamingResponse* response
-        ) override;
+        );
     
     private:
         CorbaRuntime& corba_;

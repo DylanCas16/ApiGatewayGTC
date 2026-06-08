@@ -60,6 +60,7 @@ add_executable(gateway_server
     main.cpp
     unary_server.cpp
     stream_server.cpp
+    gateway_service.cpp
 )
 
 target_include_directories(gateway_server PRIVATE

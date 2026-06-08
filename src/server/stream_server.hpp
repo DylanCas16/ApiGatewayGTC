@@ -12,7 +12,7 @@
 #include "../SubscriptionPropagator/monitor_propagator.hpp"
 
 
-class Stream final : public gateway::GatewayServer::Service {
+class Stream {
     public:
         explicit Stream(CorbaRuntime& corba): 
             corba_(corba),
@@ -24,19 +24,19 @@ class Stream final : public gateway::GatewayServer::Service {
             grpc::ServerContext* context,
             const gateway::MonitorReq* request,
             grpc::ServerWriter<gateway::MonitorEvent>* writer
-        ) override;
+        );
 
         grpc::Status SubscribeAlarms(
             grpc::ServerContext* context,
             const gateway::AlarmReq* request,
             grpc::ServerWriter<gateway::AlarmEvent>* writer
-        ) override;
+        );
 
         grpc::Status SubscribeLogs(
             grpc::ServerContext* context,
             const gateway::LogReq* request,
             grpc::ServerWriter<gateway::LogEvent>* writer
-        ) override;
+        );
     
     private:
         CorbaServant::MonitorRegistry monitor_registry_;

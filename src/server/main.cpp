@@ -1,6 +1,5 @@
 #include "../corba/corba_runtime.hpp"
-#include "unary_server.hpp"
-#include "stream_server.hpp"
+#include "gateway_service.hpp"
 #include <grpcpp/grpcpp.h>
 
 int main() {
@@ -8,11 +7,11 @@ int main() {
     corba.init();
     corba.runInBackground();
 
-    Stream stream_service(corba);
+    GatewayService service(corba);
 
     grpc::ServerBuilder builder;
     builder.AddListeningPort("0.0.0.0:50051", grpc::InsecureServerCredentials());
-    builder.RegisterService(&stream_service);
+    builder.RegisterService(&service);
     auto server = builder.BuildAndStart();
 
     server->Wait();

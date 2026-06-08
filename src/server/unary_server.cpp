@@ -1,6 +1,7 @@
 #include "unary_server.hpp"
 #include "any_adapter.hpp"
 #include "../corba/DII/device_dispatcher.hpp"
+#include "DCFC.h"
 #include <vector>
 #include <string>
 
@@ -20,10 +21,11 @@ grpc::Status Unary::Invoke(
 
     CORBA::Object_var target = corba_.ns().resolve(component_name);
 
-    if (DeviceDispatcher::isDeviceMethod(method_name)) {
+    DCF::Device_ifce_var device = DCF::Device_ifce::_narrow(target);
+    if (!CORBA::is_nil(device)) {
         try {
             std::unique_ptr<InvokeResult> device_result =
-                DeviceDispatcher::tryDispatch(target.in(), method_name, final_args);
+                DeviceDispatcher::dispatch(device, method_name, final_args);
             if (device_result) {
                 CORBA::TypeCode_var return_tc = device_result->return_value.type();
                 

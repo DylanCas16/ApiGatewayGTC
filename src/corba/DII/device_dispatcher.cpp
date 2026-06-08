@@ -1,5 +1,4 @@
 #include "device_dispatcher.hpp"
-#include "DCFC.h"
 #include <stdexcept>
 #include <unordered_map>
 #include <iostream>
@@ -47,29 +46,27 @@ bool DeviceDispatcher::isDeviceMethod(const std::string& method) {
         method == "configure" || method == "report" || method == "internals";
 }
 
-std::unique_ptr<InvokeResult> DeviceDispatcher::tryDispatch(CORBA::Object_ptr target,
+std::unique_ptr<InvokeResult> DeviceDispatcher::dispatch(DCF::Device_ifce_ptr device,
                                                             const std::string& method,
                                                             const std::vector<CORBA::Any>& args)
 {
     try {
-        DCF::Device_ifce_var device = DCF::Device_ifce::_narrow(target);
-        if (CORBA::is_nil(device)) return nullptr;
+        if (!isDeviceMethod(method)) return nullptr;
 
         std::cout << "[DeviceDispatcher] Device method: " << method << std::endl;
 
         InvokeResult result;
-        DCF::Device_ifce_ptr raw = device.in();
 
         auto void_method = VoidMethodsList.find(method);
         if (void_method != VoidMethodsList.end()) {
-            (raw->*(void_method->second))();
+            (device->*(void_method->second))();
             result.return_value = makeVoid();
             return std::unique_ptr<InvokeResult>(new InvokeResult(result));
         }
 
         auto bool_method = BoolMethodsList.find(method);
         if (bool_method != BoolMethodsList.end()) {
-            result.return_value = makeBool((raw->*(bool_method->second))());
+            result.return_value = makeBool((device->*(bool_method->second))());
             return std::unique_ptr<InvokeResult>(new InvokeResult(result));
         }
 
@@ -81,7 +78,7 @@ std::unique_ptr<InvokeResult> DeviceDispatcher::tryDispatch(CORBA::Object_ptr ta
                     "[DeviceDispatcher] DeviceDispatcher::configure: expected string argument");
             }
 
-            raw->configure(config_name);
+            device->configure(config_name);
             result.return_value = makeVoid();
             return std::unique_ptr<InvokeResult>(new InvokeResult(result));
         }
@@ -91,13 +88,13 @@ std::unique_ptr<InvokeResult> DeviceDispatcher::tryDispatch(CORBA::Object_ptr ta
             CORBA::Short level = 0; 
             if (!args.empty()) args[0] >>= level;
 
-            CORBA::String_var report_value = raw->report(level);
+            CORBA::String_var report_value = device->report(level);
             result.return_value = makeString(report_value.in());
             return std::unique_ptr<InvokeResult>(new InvokeResult(result));
         }
 
         if (method == "internal") {
-            CORBA::String_var info = raw->internals();
+            CORBA::String_var info = device->internals();
             result.return_value = makeString(info.in());
             return std::unique_ptr<InvokeResult>(new InvokeResult(result));
         }
