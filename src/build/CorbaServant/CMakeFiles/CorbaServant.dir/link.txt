@@ -1,0 +1,2 @@
+/usr/bin/ar qc libCorbaServant.a  CMakeFiles/CorbaServant.dir/monitor_consumer.cpp.o CMakeFiles/CorbaServant.dir/corba_servant.cpp.o
+/usr/bin/ranlib libCorbaServant.a

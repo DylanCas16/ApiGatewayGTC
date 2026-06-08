@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblib_dii_invoke.a  CMakeFiles/lib_dii_invoke.dir/dii_invocation.cpp.o CMakeFiles/lib_dii_invoke.dir/device_dispatcher.cpp.o
+/usr/bin/ranlib liblib_dii_invoke.a

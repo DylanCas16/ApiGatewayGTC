@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblib_ns_resolver.a  CMakeFiles/lib_ns_resolver.dir/ns_discover.cpp.o
+/usr/bin/ranlib liblib_ns_resolver.a

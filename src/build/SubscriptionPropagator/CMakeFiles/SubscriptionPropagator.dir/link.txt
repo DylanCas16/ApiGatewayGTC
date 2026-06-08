@@ -1,0 +1,2 @@
+/usr/bin/ar qc libSubscriptionPropagator.a  CMakeFiles/SubscriptionPropagator.dir/monitor_propagator.cpp.o
+/usr/bin/ranlib libSubscriptionPropagator.a

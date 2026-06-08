@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/gcsdev/final_gateway/src/corba/gcs_endpoints.cpp
+gcs_endpoints.h
+/home/gcsdev/final_gateway/src/corba/gcs_endpoints.h
+
+/home/gcsdev/final_gateway/src/corba/gcs_endpoints.h
+
