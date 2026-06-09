@@ -125,10 +125,10 @@ def test_monitor(stub, component_name, magnitude, type, max_events=10):
                 last_ts = block.time_stamp
 
                 print(f"DataBlock received ({event_count:2d}/{max_events})")
-                print("ID: " + block.id)
-                print("Component name: " + block.component_name)
-                print("Magnitude: " + block.magnitude)
-                print("Timestamp: " + block.time_stamp)
+                print(f"ID: {block.id}")
+                print(f"Component name: {block.component_name}")
+                print(f"Magnitude: {block.magnitude}")
+                print(f"Timestamp: {block.time_stamp}")
                 print(f"Samples: {block.samples}")
                 print("-----------------------------------")
             
@@ -142,9 +142,9 @@ def test_monitor(stub, component_name, magnitude, type, max_events=10):
                 last_ts = state.time_stamp
 
                 print(f"StateChange received ({event_count:2d}/{max_events})")
-                print("Component name: " + state.component_name)
-                print("Timestamp: " + state.time_stamp)
-                print("New value: " + state.new_state)
+                print(f"Component name: {state.component_name}")
+                print(f"Timestamp: {state.time_stamp}")
+                print(f"New value: {state.new_state}")
                 print("-----------------------------------")
 
             if data_type == "magnitude_change":
@@ -157,10 +157,10 @@ def test_monitor(stub, component_name, magnitude, type, max_events=10):
                 last_ts = mag_change.time_stamp
 
                 print(f"MagnitudeChange received ({event_count:2d}/{max_events})")
-                print("Component name: " + mag_change.component_name)
-                print("Magnitude: " + mag_change.magnitude)
-                print("Timestamp: " + mag_change.time_stamp)
-                print("New value: " + mag_change.new_value)
+                print(f"Component name: {mag_change.component_name}")
+                print(f"Magnitude: {mag_change.magnitude}")
+                print(f"Timestamp: {mag_change.time_stamp}")
+                print(f"New value: {mag_change.new_value}")
                 print("-----------------------------------")
             
             if event_count >= max_events:
@@ -249,7 +249,7 @@ def main():
 
     print("------------Stream----------------")
 
-    # test_monitor(stub, "M1/M1CS", "temperature", "DataBlocks")
+    test_monitor(stub, component_name, "floatMonitor1", "DataBlocks")
 
     print("----------------------------------")
 
