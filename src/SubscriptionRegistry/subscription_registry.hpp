@@ -26,6 +26,12 @@ class SubscriptionRegistry {
         static std::string magnitudeChangeKey(const std::string& component,
                                         const std::string& magnitude)
         { return "M:" + component + ":" + magnitude; }
+
+        static std::string eventKey(const std::string& alarm,
+                                    const std::string& component, 
+                                    const std::string& state,
+                                    const std::string& severity)
+        { return alarm + ":" + component + ":" + state + ":" + severity; }
     
         uint64_t addEntry(const std::string& key, grpc::ServerWriter<T>* writer)
         {

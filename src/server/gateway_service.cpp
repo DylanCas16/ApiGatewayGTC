@@ -25,7 +25,33 @@ grpc::Status GatewayService::ListNaming(
 {
     return unary_.ListNaming(context, request, response);
 }
- 
+
+// config_server
+/*
+grpc::Status GetProperty(
+    grpc::ServerContext* context,
+    const gateway::GetPropRequest* request,
+    gateway::PropertyValue* response)
+{
+    return config_.GetProperty(context, request, response);
+}
+
+grpc::Status SetProperty(
+    grpc::ServerContext* context,
+    const gateway::SetPropRequest* request,
+    grpc::SetPropResponse* response)
+{
+    return config_.SetProperty(context, request, response);
+}
+
+    grpc::Status SubscribeConfig(
+        grpc::ServerContext* context,
+        const gateway::ConfigReq* request,
+        grpc::ServerWriter<gateway::ConfigEvent>* writer)
+{
+    return config_.SubscribeConfig(context, request, writer);
+}
+*/ 
 // stream_server
  
 grpc::Status GatewayService::SubscribeMonitor(
