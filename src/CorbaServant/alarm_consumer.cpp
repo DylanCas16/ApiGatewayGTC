@@ -11,7 +11,7 @@ void AlarmConsumer::receiveAlarms(const ALARM::EventList& event_list) {
         *alarm_event.mutable_event() = AlarmAdapter::fromEvent(event);
         
         registry_.dispatch(
-            Registry::EventKey(event.alarm.in(), event.component_name.in(), std::string(event.state.in())),
+            Registry::EventKey(event.name.in(), event.gcs_component.in()),
             alarm_event
         );
     }
