@@ -1,2 +1,0 @@
-/usr/bin/ar qc liblib_ifr_client.a  CMakeFiles/lib_ifr_client.dir/ifr_connect.cpp.o
-/usr/bin/ranlib liblib_ifr_client.a

@@ -247,13 +247,9 @@ def main():
     
     test_invoke(stub, component_name, "processLong", [70])
 
-    print("----------------------------------")
-    
-    test_invoke(stub, "MonitorManagers/MM1", "getMagnitudes", component_name)
-
     print("------------Stream----------------")
 
-    # test_monitor(stub, component_name, "doubleMagnitude", "DataBlocks")
+    # test_monitor(stub, "M1/M1CS", "temperature", "DataBlocks")
 
     print("----------------------------------")
 

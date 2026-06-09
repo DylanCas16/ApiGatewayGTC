@@ -1,2 +1,0 @@
-/usr/bin/ar qc liblib_gcs_endpoints.a  CMakeFiles/lib_gcs_endpoints.dir/gcs_endpoints.cpp.o
-/usr/bin/ranlib liblib_gcs_endpoints.a
