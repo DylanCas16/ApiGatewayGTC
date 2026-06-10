@@ -1,11 +1,12 @@
 #include "monitor_propagator.hpp"
-#include "../corba/NamingService/ns_discover.hpp"
+
 #include "../corba/gcs_endpoints.h"
 #include <iostream>
 #include <stdexcept>
 
 
-MonitorPropagator::MonitorPropagator(NsResolver& ns, Registry& registry) : ns_(ns), registry_(registry) {}
+MonitorPropagator::MonitorPropagator(NsResolver& ns, Registry& registry) :
+    Base(ns, registry, gcs_env::GCS_MONITOR_NAME) {}
 
 uint64_t MonitorPropagator::subscribe(const std::string& component, const std::string& magnitude,
                                         gateway::MonitorType type, MM::Consumer_ifce_ptr consumer,
@@ -58,20 +59,13 @@ void MonitorPropagator::unsubscribe(uint64_t id, const std::string& component, c
     }
 }
 
-void MonitorPropagator::ensureConnected() {
-    if (isConnected()) return;
-
-    CORBA::Object_var obj = ns_.resolve(gcs_env::GCS_MONITOR_NAME);
-    if (CORBA::is_nil(obj.in())) {
-        throw std::runtime_error("[MonitorPropagator] MonitorManager Naming Service not found");
-    }
-
-    propagator_ = MM::MonitorPropagator_ifce::_narrow(obj.in());
-    if (CORBA::is_nil(propagator_.in())) {
+void MonitorPropagator::narrowCorbaObject(CORBA::Object_ptr obj)
+{
+    propagator_ = MM::MonitorPropagator_ifce::_narrow(obj);
+    if (CORBA::is_nil(propagator_.in()))
         throw std::runtime_error("[MonitorPropagator] Narrow to MonitorPropagator_ifce failed");
-    }
 
-    std::cout << "[MonitorPropagator] Connected to MonitorManager" << std::endl;
+    std::cout << "[MonitorPropagator] Connected to MonitorManager\n";
 }
 
 void MonitorPropagator::corbaSubscribe(const std::string& component, const std::string& magnitude,

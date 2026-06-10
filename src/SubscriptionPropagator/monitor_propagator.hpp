@@ -1,20 +1,16 @@
 #pragma once
 
-#include <tao/corba.h>
-#include <string>
-#include <stdint.h>
+#include "subscription_propagator.hpp"
 #include "MMCommonC.h"
-#include "MonitorManagerC.h"
-#include "../SubscriptionRegistry/subscription_registry.hpp"
-#include "../corba/corba_runtime.hpp"
 #include "stream.pb.h"
+#include <tao/corba.h>
 
 
-class MonitorPropagator {
+class MonitorPropagator : public SubscriptionPropagator<gateway::MonitorEvent> {
     public:
-        using Registry = SubscriptionRegistry<gateway::MonitorEvent>;
+        using Base = SubscriptionPropagator<gateway::MonitorEvent>;
 
-        MonitorPropagator(NsResolver& ns, Registry& registry);
+        MonitorPropagator(NsResolver& ns, Base::Registry& registry);
         
         uint64_t subscribe(const std::string& component, const std::string& magnitude,
                             gateway::MonitorType type, MM::Consumer_ifce_ptr consumer,
@@ -24,12 +20,12 @@ class MonitorPropagator {
         void unsubscribe(uint64_t id, const std::string& component, const std::string& magnitude,
                             gateway::MonitorType type, MM::Consumer_ifce_ptr consumer
         );
-
-        bool isConnected() const { return !CORBA::is_nil(propagator_.in()); }
     
-    private:
-        void ensureConnected();
+    protected:
+        CORBA::Object_ptr propagatorObject() const override { return propagator_.in(); }
+        void narrowCorbaObject(CORBA::Object_ptr obj) override;
 
+    private:
         void corbaSubscribe(const std::string& component, const std::string& magnitude, 
                             gateway::MonitorType type, MM::Consumer_ifce_ptr consumer
         );
@@ -38,7 +34,5 @@ class MonitorPropagator {
                             gateway::MonitorType type, MM::Consumer_ifce_ptr consumer
         );
 
-        NsResolver& ns_;
-        Registry& registry_;
         MM::MonitorPropagator_ifce_var propagator_;
 };

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.17)
  
 add_library(SubscriptionPropagator STATIC
     monitor_propagator.cpp
+    alarm_propagator.cpp
+
 )
  
 target_include_directories(SubscriptionPropagator PUBLIC
