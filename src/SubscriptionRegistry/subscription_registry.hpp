@@ -30,7 +30,7 @@ class SubscriptionRegistry {
         static std::string eventKey(const std::string& component)
         { return "A:" + component; }
 
-        static std::string logKey(const std::string& component)
+        static std::string recordKey(const std::string& component)
         { return "L:" + component; }
 
         static std::string configKey(const std::string& component)

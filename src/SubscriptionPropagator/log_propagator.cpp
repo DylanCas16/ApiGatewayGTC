@@ -10,7 +10,7 @@ LogPropagator::LogPropagator(NsResolver& ns, Registry& registry) :
 
 uint64_t LogPropagator::subscribe(const std::string& component,
                             LOG::Consumer_ifce_ptr consumer,
-                            grpc::ServerWriter<gateway::AlarmEvent>* writer)
+                            grpc::ServerWriter<gateway::LogEvent>* writer)
 {
     ensureConnected();
 
@@ -54,10 +54,10 @@ void LogPropagator::narrowCorbaObject(CORBA::Object_ptr obj)
 
 void LogPropagator::corbaSubscribe(LOG::Consumer_ifce_ptr consumer)
 {
-    propagator_->subscribeToAlarms(consumer);
+    propagator_->subscribeToMessages(consumer);
 }
 
 void LogPropagator::corbaUnsubscribe(LOG::Consumer_ifce_ptr consumer)
 {
-    propagator_->unsubscribeToAlarms(consumer);
+    propagator_->unsubscribeToMessages(consumer);
 }

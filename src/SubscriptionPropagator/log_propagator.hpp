@@ -15,7 +15,7 @@ class LogPropagator : public SubscriptionPropagator<gateway::LogEvent> {
 
         uint64_t subscribe(const std::string& component,
                             LOG::Consumer_ifce_ptr consumer,
-                            grpc::ServerWriter<gateway::AlarmEvent>* writer
+                            grpc::ServerWriter<gateway::LogEvent>* writer
         );
 
         void unsubscribe(uint64_t id, const std::string& component,

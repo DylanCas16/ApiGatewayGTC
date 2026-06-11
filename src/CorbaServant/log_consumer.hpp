@@ -15,7 +15,7 @@ class LogConsumer : public POA_LOG::Consumer_ifce {
         explicit LogConsumer(Registry& registry);
         virtual ~LogConsumer() = default;
 
-        virtual void receiveLogs(const LOG::RecordList& record_list);
+        virtual void receiveLogMessages(const LOG::RecordList& record_list) override;
     private:
         Registry& registry_;
 };
