@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.17)
 add_library(CorbaServant STATIC
     alarm_consumer.cpp
     monitor_consumer.cpp
+    log_consumer.cpp
     corba_servant.cpp
 )
 

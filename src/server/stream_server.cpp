@@ -57,6 +57,18 @@ grpc::Status Stream::SubscribeLogs(
     grpc::ServerWriter<gateway::LogEvent>* writer
 )
 {
-    std::cout << "Log subscription in proccess" << std::endl;
+    const std::string& component_name = request->component_name();
+
+    LOG::Consumer_ifce_var consumer = corba_servant_.getLogConsumerObject();
+
+    uint64_t id = log_propagator_.subscribe(
+        component_name, consumer.in(), writer);
+
+    while (!context->IsCancelled() && log_registry_.isActive(id)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    log_propagator_.unsubscribe(id, component_name, consumer.in());
+
     return grpc::Status::OK;
 }
