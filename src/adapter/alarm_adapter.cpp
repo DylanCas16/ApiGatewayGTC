@@ -39,8 +39,8 @@ gateway::AlarmSeverity AlarmAdapter::fromSeverity(ALARM::Severity_t severity)
     }
 }
 
-int64_t AlarmAdapter::fromTimeValue(const DGT::TimeValue& tv)
+int64_t AlarmAdapter::fromTimeValue(const DGT::TimeValue& time_value)
 {
-    return static_cast<int64_t>(tv.sec)  * 1000000000LL
-         + static_cast<int64_t>(tv.usec) * 1000LL;
+    return static_cast<int64_t>(time_value.usec)  * 1000000000LL
+         + static_cast<int64_t>(time_value.usec) * 1000LL;
 }

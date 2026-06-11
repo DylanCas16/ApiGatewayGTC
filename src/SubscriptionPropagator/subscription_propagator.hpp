@@ -31,7 +31,6 @@ class SubscriptionPropagator {
 
         virtual void narrowCorbaObject(CORBA::Object_ptr obj) = 0;
         virtual CORBA::Object_ptr propagatorObject() const = 0;
-        virtual void ensureConnected() = 0;
 
         static std::string makeTopic(const std::string& component,
                                   const std::string& magnitude)

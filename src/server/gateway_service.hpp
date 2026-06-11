@@ -11,7 +11,8 @@
 class GatewayService final : public gateway::GatewayServer::Service {
 public:
     explicit GatewayService(CorbaRuntime& corba)
-        : unary_(corba), stream_(corba), config_(corba)
+        : unary_(corba), stream_(corba)
+        //, config_(corba)
     {}
  
     grpc::Status Invoke(
@@ -71,5 +72,5 @@ public:
 private:
     Unary  unary_;
     Stream stream_;
-    Config config_;
+    // Config config_;
 };

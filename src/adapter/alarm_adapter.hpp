@@ -1,7 +1,7 @@
 #pragma once
 
 #include <tao/ORB.h>
-#include "ALARMCommonC.h"
+#include "ALARMC.h"
 #include "DGTC.h"
 #include "adapter.pb.h"
 #include "stream.pb.h"

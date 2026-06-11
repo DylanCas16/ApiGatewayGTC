@@ -1,9 +1,10 @@
 #pragma once
 
+#include <tao/corba.h>
 #include "subscription_propagator.hpp"
 #include "MMCommonC.h"
+#include "MonitorManagerC.h"
 #include "stream.pb.h"
-#include <tao/corba.h>
 
 
 class MonitorPropagator : public SubscriptionPropagator<gateway::MonitorEvent> {

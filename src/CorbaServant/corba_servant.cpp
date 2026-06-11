@@ -8,7 +8,7 @@ CORBA::Object_var CorbaServant::activateServantObject(PortableServer::ServantBas
     return poa_->id_to_reference(oid);
 }
 
-void CorbaServant::deactivateServant(PortableServer::ServantBase*& impl, const char* name) {
+void CorbaServant::deactivateServant(PortableServer::ServantBase* impl, const char* name) {
     if (!impl) return;
     try {
         PortableServer::ObjectId_var oid = poa_->servant_to_id(impl);
@@ -18,7 +18,6 @@ void CorbaServant::deactivateServant(PortableServer::ServantBase*& impl, const c
                   << e._name() << "\n";
     }
     delete impl;
-    impl = nullptr;
 }
 
 CorbaServant::CorbaServant(CORBA::ORB_ptr orb, 
@@ -41,16 +40,16 @@ CorbaServant::CorbaServant(CORBA::ORB_ptr orb,
 }
 
 CorbaServant::~CorbaServant() {
-    deactivateServant(
-        reinterpret_cast<PortableServer::ServantBase*&>(monitor_consumer_impl_),
-        "MonitorConsumer");
-    deactivateServant(
-        reinterpret_cast<PortableServer::ServantBase*&>(alarm_consumer_impl_),
-        "AlarmConsumer");
+    deactivateServant(monitor_consumer_impl_, "MonitorConsumer");
+    deactivateServant(alarm_consumer_impl_, "AlarmConsumer");
 }
 
 MM::Consumer_ifce_ptr CorbaServant::getMonitorConsumerObject() const {
     return MM::Consumer_ifce::_duplicate(monitor_consumer_ref_.in());
+}
+
+ALARM::Consumer_ifce_ptr CorbaServant::getAlarmConsumerObject() const {
+    return ALARM::Consumer_ifce::_duplicate(alarm_consumer_ref_.in());
 }
 
 void CorbaServant::activateMonitorConsumer() {

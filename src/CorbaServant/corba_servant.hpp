@@ -6,7 +6,7 @@
 #include "stream.pb.h"
 
 #include "MMCommonC.h"
-#include "ALARMCommonC.h"
+#include "ALARMC.h"
 #include "monitor_consumer.hpp"
 #include "alarm_consumer.hpp"
 

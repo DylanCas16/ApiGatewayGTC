@@ -1,9 +1,10 @@
 #pragma once
 
-#include "subscription_propagator.hpp"
-#include "ALARMCommonC.h"
-#include "stream.pb.h"
 #include <tao/corba.h>
+#include "subscription_propagator.hpp"
+#include "ALARMC.h"
+#include "ALARMManagerC.h"
+#include "stream.pb.h"
 
 
 class AlarmPropagator : public SubscriptionPropagator<gateway::AlarmEvent> {
@@ -12,13 +13,12 @@ class AlarmPropagator : public SubscriptionPropagator<gateway::AlarmEvent> {
 
         AlarmPropagator(NsResolver& ns, Base::Registry& registry);
 
-        uint64_t subscribe(const std::string& component, const std::string& alarm,
+        uint64_t subscribe(const std::string& component,
                             ALARM::Consumer_ifce_ptr consumer,
                             grpc::ServerWriter<gateway::AlarmEvent>* writer
         );
 
         void unsubscribe(uint64_t id, const std::string& component,
-                            const std::string& alarm,
                             ALARM::Consumer_ifce_ptr consumer
         );
 
@@ -27,14 +27,8 @@ class AlarmPropagator : public SubscriptionPropagator<gateway::AlarmEvent> {
         void narrowCorbaObject(CORBA::Object_ptr obj) override;
 
     private:
-        void corbaSubscribe(const std::string& component, const std::string& alarm,
-                            ALARM::Consumer_ifce_ptr consumer
-        );
+        void corbaSubscribe(ALARM::Consumer_ifce_ptr consumer);
+        void corbaUnsubscribe(ALARM::Consumer_ifce_ptr consumer);
 
-        void corbaUnsubscribe(const std::string& component, const std::string& alarm,
-                            ALARM::Consumer_ifce_ptr consumer
-
-        );
-
-        ALARM::AlarmPropagator_ifce_var propagator_;
+        ALARM::Manager_ifce_var propagator_;
 };

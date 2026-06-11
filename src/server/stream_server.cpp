@@ -35,7 +35,19 @@ grpc::Status Stream::SubscribeAlarms(
     grpc::ServerWriter<gateway::AlarmEvent>* writer
 )
 {
-    std::cout << "Alarm subscription in proccess" << std::endl;
+    const std::string& component_name = request->component_name();
+
+    ALARM::Consumer_ifce_var consumer = corba_servant_.getAlarmConsumerObject();
+
+    uint64_t id = alarm_propagator_.subscribe(
+        component_name, consumer.in(), writer);
+
+    while (!context->IsCancelled() && alarm_registry_.isActive(id)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    alarm_propagator_.unsubscribe(id, component_name, consumer.in());
+
     return grpc::Status::OK;
 }
 

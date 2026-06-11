@@ -94,7 +94,7 @@ def test_invoke(stub, component_name, method_name, args=None):
     return
 
 def test_monitor(stub, component_name, magnitude, type, max_events=10):
-    print("Starting Monitor subscription method...")
+    print("Starting Monitor subscription test...")
 
     request = stream_pb2.MonitorReq(component_name=component_name,
                                     magnitude=magnitude,
@@ -164,14 +164,14 @@ def test_monitor(stub, component_name, magnitude, type, max_events=10):
                 print("-----------------------------------")
             
             if event_count >= max_events:
-                print(f"\nMax event number reached ({max_events} events). Closing stream...")
+                print(f"\nMax Monitor events reached ({max_events} events). Closing stream...")
                 response_stream.cancel()
                 break
     except grpc.RpcError as e:
         if e.code() == grpc.StatusCode.CANCELLED:
-            print("Stream closed by client.")
+            print("Monitor stream closed by client.")
         else:
-            print(f"Stream error: ({e.code().name}) {e.details()}")
+            print(f"Monitor stream error: ({e.code().name}) {e.details()}")
     
     stream_stopped = False
     try:
@@ -183,15 +183,73 @@ def test_monitor(stub, component_name, magnitude, type, max_events=10):
     
     passed = event_count >= max_events and ts_errors == 0 and stream_stopped
     print(f"\nTEST RESULTS")
-    print(f"  Events received: {event_count}/{max_events}  "
-          f"{'PASS' if event_count >= max_events else 'FAIL'}")
-    print(f"  Timestamps corrects: "
-          f"{'PASS' if ts_errors == 0 else f'FAIL ({ts_errors} fails)'}")
+    print(f"  Events received: {event_count}/{max_events} {'PASS' if event_count >= max_events else 'FAIL'}")
+    print(f"  Timestamps corrects: {'PASS' if ts_errors == 0 else f'FAIL ({ts_errors} fails)'}")
     print(f"  Stream closing: {'PASS' if stream_stopped else 'FAIL'}")
     print(f"  GLOBAL: {'PASS' if passed else 'FAIL'}")
 
     return
 
+def test_alarm(stub, component, alarm_filter=None, state_filter=None, severity_filter=None, max_events=10):
+    print("Starting Alarm subscription test...")
+
+    request = stream_pb2.AlarmReq(component_name=component)
+
+    event_count = 0
+    skipped = 0
+    response_stream = stub.SubscribeAlarms(request)
+
+    print("Subscribed. Waiting for events...\n")
+
+    try:
+        for data in response_stream:
+            if alarm_filter is not None and data.name != alarm_filter:
+                skipped +=1
+                continue
+            if state_filter is not None and data.state != state_filter:
+                skipped += 1
+                continue
+            if severity_filter is not None and data.severity != severity_filter:
+                skipped += 1
+                continue
+
+            event_count += 1
+
+            print(f"Alarm received ({event_count:2d}/{max_events})")
+            print(f"Alarm name: {data.alarm_name}")
+            print(f"Component name: {data.component_name}")
+            print(f"State: {data.state}")
+            print(f"Severity: {data.severity}")
+            print(f"Description: {data.description}")
+            print(f"Timestamp: {data.time_stamp}")
+            print(f"ID: {data.id}")
+            print("-----------------------------------")
+
+            if event_count >= max_events:
+                print(f"\nMax Alarm events reached ({max_events}). Closing stream...")
+                response_stream.cancel()
+                break
+
+    except grpc.RpcError as e:
+        if e.code() == grpc.StatusCode.CANCELLED:
+            print("Alarm stream closed by client.")
+        else:
+            print(f"Alarm stream error: ({e.code().name}) {e.details()}")
+    
+    stream_stopped = False
+    try:
+        next(iter(response_stream))
+        print("Closing failed: new data received.")
+    except (grpc.RpcError, StopIteration):
+        stream_stopped = True
+        print("Stream stopped correctly.")
+
+    passed = event_count >= max_events and stream_stopped
+    print(f"\nTEST RESULTS")
+    print(f"  Events received: {event_count}/{max_events} {'PASS' if event_count >= max_events else 'FAIL'}")
+    print(f"  Events skipped: {skipped}")
+    print(f"  Stream closing: {'PASS' if stream_stopped else 'FAIL'}")
+    print(f"  GLOBAL: {'PASS' if passed else 'FAIL'}")
 
 
 def main():
@@ -250,6 +308,10 @@ def main():
     print("------------Stream----------------")
 
     test_monitor(stub, component_name, "floatMonitor1", "DataBlocks")
+
+    print("----------------------------------")
+
+    test_alarm(stub, component_name)
 
     print("----------------------------------")
 

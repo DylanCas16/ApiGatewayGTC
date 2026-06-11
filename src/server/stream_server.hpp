@@ -1,23 +1,22 @@
 #pragma once
  
 #include <grpcpp/grpcpp.h>
-#include <thread>
-#include <chrono>
- 
 #include "server.grpc.pb.h"
 #include "stream.pb.h"
  
 #include "corba_runtime.hpp"
 #include "../CorbaServant/corba_servant.hpp"
 #include "../SubscriptionPropagator/monitor_propagator.hpp"
+#include "../SubscriptionPropagator/alarm_propagator.hpp"
 
 
 class Stream {
     public:
         explicit Stream(CorbaRuntime& corba): 
             corba_(corba),
-            corba_servant_(corba.orb(), corba.rootPoa(), monitor_registry_),
-            monitor_propagator_(corba.ns(), monitor_registry_) 
+            corba_servant_(corba.orb(), corba.rootPoa(), monitor_registry_, alarm_registry_),
+            monitor_propagator_(corba.ns(), monitor_registry_),
+            alarm_propagator_(corba.ns(), alarm_registry_)
         {}
         
         grpc::Status SubscribeMonitor(
@@ -39,8 +38,10 @@ class Stream {
         );
     
     private:
-        CorbaServant::MonitorRegistry monitor_registry_;
-        CorbaRuntime& corba_;
-        CorbaServant corba_servant_;
-        MonitorPropagator monitor_propagator_;
+    CorbaRuntime& corba_;
+    CorbaServant::MonitorRegistry monitor_registry_;
+    CorbaServant::AlarmRegistry alarm_registry_;
+    CorbaServant corba_servant_;
+    MonitorPropagator monitor_propagator_;
+    AlarmPropagator alarm_propagator_;
 };
