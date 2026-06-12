@@ -25,6 +25,5 @@ gateway::MessageType LogAdapter::fromType(LOG::MessageType type)
 
 int64_t LogAdapter::fromTimeValue(const DGT::TimeValue& time_value)
 {
-    return static_cast<int64_t>(time_value.usec)  * 1000000000LL
-         + static_cast<int64_t>(time_value.usec) * 1000LL;
+    return static_cast<int64_t>(time_value.usec) * 1000LL;
 }

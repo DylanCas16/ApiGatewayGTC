@@ -9,25 +9,22 @@ import unary_pb2
 import adapter_pb2
 
 
-def generate_alarm(stub, times=10, delay=2.0):
+def generate_message(stub, times=10, delay=2.0):
     component_name = "Test/InspectorDevice_1"
 
     for i in range(times):
         try:
-            arg = [adapter_pb2.AnyValue(type_kind=adapter_pb2.TYPE_SHORT, short_val=1)]
             stub.Invoke(unary_pb2.InvokeRequest(
                 component_name=component_name,
-                method_name="sendAlarm", 
-                args=arg
+                 method_name="sendLogInfoMessage"
             ))
-            print(f"sendAlarm call {i+1}/{times}")
+            print(f"InfoMessage call {i+1}/{times}")
 
             stub.Invoke(unary_pb2.InvokeRequest(
                 component_name=component_name,
-                method_name="cancelAlarm",
-                args=arg
+                method_name="sendLogErrorMessage"
             ))
-            print(f"cancelAlarm call {i+1}/{times}")
+            print(f"ErrorMessage call {i+1}/{times}")
 
             if i < times - 1:
                 print(f"  Waiting {delay}s...")
@@ -54,7 +51,7 @@ def main():
         channel.close()
         return
     
-    generate_alarm(stub)
+    generate_message(stub)
 
     channel.close()
     return
