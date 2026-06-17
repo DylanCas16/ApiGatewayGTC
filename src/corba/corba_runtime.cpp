@@ -1,12 +1,7 @@
 #include "corba_runtime.hpp"
-#include "NamingService/ns_discover.hpp"
-#include "InterfaceRepository/ifr_connect.hpp"
-#include "DII/dii_invocation.hpp"
 #include "gcs_endpoints.h"
-
 #include <iostream>
 #include <stdexcept>
-#include <iostream>
 
 
 void CorbaRuntime::init() {
@@ -35,6 +30,9 @@ void CorbaRuntime::init() {
     ifr_client_->connect();
 
     dii_engine_ = std::unique_ptr<DiiEngine>(new DiiEngine(orb_.in()));
+
+    config_service_ = std::unique_ptr<ConfigService>(new ConfigService(*ns_resolver_));
+    config_service_->connect();
  
     std::cout << "[CorbaRuntime] init OK" << std::endl;
 }

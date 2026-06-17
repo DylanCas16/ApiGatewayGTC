@@ -27,8 +27,8 @@ grpc::Status GatewayService::ListNaming(
 }
 
 // config_server
-/*
-grpc::Status GetProperty(
+
+grpc::Status GatewayService::GetProperty(
     grpc::ServerContext* context,
     const gateway::GetPropRequest* request,
     gateway::PropertyValue* response)
@@ -36,22 +36,22 @@ grpc::Status GetProperty(
     return config_.GetProperty(context, request, response);
 }
 
-grpc::Status SetProperty(
+grpc::Status GatewayService::SetProperty(
     grpc::ServerContext* context,
     const gateway::SetPropRequest* request,
-    grpc::SetPropResponse* response)
+    gateway::SetPropResponse* response)
 {
     return config_.SetProperty(context, request, response);
 }
 
-    grpc::Status SubscribeConfig(
-        grpc::ServerContext* context,
-        const gateway::ConfigReq* request,
-        grpc::ServerWriter<gateway::ConfigEvent>* writer)
+grpc::Status GatewayService::SubscribeConfig(
+    grpc::ServerContext* context,
+    const gateway::ConfigReq* request,
+    grpc::ServerWriter<gateway::ConfigEvent>* writer)
 {
     return config_.SubscribeConfig(context, request, writer);
 }
-*/ 
+
 // stream_server
  
 grpc::Status GatewayService::SubscribeMonitor(

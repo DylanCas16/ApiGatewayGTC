@@ -30,7 +30,7 @@ void NsResolver::connect() {
 CORBA::Object_var NsResolver::resolve(const std::string& path,
                                       const std::string& leaf_kind) const {
     if (CORBA::is_nil(root_.in()))
-        throw std::runtime_error("NsResolver: not connected — call connect() first");
+        throw std::runtime_error("NsResolver: not connected - call connect() first");
  
     CosNaming::Name name = buildName(path, leaf_kind);
  

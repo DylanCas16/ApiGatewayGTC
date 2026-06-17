@@ -9,12 +9,12 @@
 
 #include "corba_runtime.hpp"
 #include "../CorbaServant/corba_servant.hpp"
-#include "../SubscriptionPropagator/config_propagator.hpp"
+// #include "../SubscriptionPropagator/config_propagator.hpp"
 
 
 class Config {
     public:
-        explicit Config(CorbaRuntime& corba) : corba_(corba) {}
+        explicit Config(CorbaRuntime& corba);
 
         grpc::Status GetProperty(
             grpc::ServerContext* context,
@@ -25,7 +25,7 @@ class Config {
         grpc::Status SetProperty(
             grpc::ServerContext* context,
             const gateway::SetPropRequest* request,
-            grpc::SetPropResponse* response
+            gateway::SetPropResponse* response
         );
 
         grpc::Status SubscribeConfig(
