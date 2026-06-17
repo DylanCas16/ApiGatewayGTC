@@ -4,7 +4,7 @@ add_library(SubscriptionPropagator STATIC
     monitor_propagator.cpp
     alarm_propagator.cpp
     log_propagator.cpp
-
+    config_propagator.cpp
 )
  
 target_include_directories(SubscriptionPropagator PUBLIC
