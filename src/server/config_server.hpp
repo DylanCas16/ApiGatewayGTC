@@ -9,7 +9,7 @@
 
 #include "corba_runtime.hpp"
 #include "../CorbaServant/corba_servant.hpp"
-// #include "../SubscriptionPropagator/config_propagator.hpp"
+#include "../SubscriptionPropagator/config_propagator.hpp"
 
 
 class Config {
