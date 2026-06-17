@@ -4,6 +4,7 @@ add_library(CorbaServant STATIC
     alarm_consumer.cpp
     monitor_consumer.cpp
     log_consumer.cpp
+    config_consumer.cpp
     corba_servant.cpp
 )
 

@@ -33,8 +33,8 @@ class SubscriptionRegistry {
         static std::string recordKey(const std::string& component)
         { return "L:" + component; }
 
-        static std::string configKey(const std::string& component)
-        {return "C:" + component;  }
+        static std::string propertyKey(const std::string& property)
+        {return "C:" + property;  }
     
         uint64_t addEntry(const std::string& key, grpc::ServerWriter<T>* writer)
         {

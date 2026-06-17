@@ -24,29 +24,34 @@ CorbaServant::CorbaServant(CORBA::ORB_ptr orb,
                             PortableServer::POA_ptr poa, 
                             MonitorRegistry& monitor_registry,
                             AlarmRegistry& alarm_registry,
-                            LogRegistry& log_registry):
+                            LogRegistry& log_registry,
+                            ConfigRegistry& config_registry):
                             
                             orb_ (CORBA::ORB::_duplicate(orb)),
                             poa_ (PortableServer::POA::_duplicate(poa)),
 
                             monitor_consumer_impl_ (nullptr),
                             alarm_consumer_impl_ (nullptr),
-                            log_consumer_impl_ (nullptr), 
+                            log_consumer_impl_ (nullptr),
+                            config_consumer_impl_ (nullptr),
 
                             monitor_registry_ (monitor_registry),
                             alarm_registry_ (alarm_registry),
-                            log_registry_ (log_registry)
+                            log_registry_ (log_registry),
+                            config_registry_ (config_registry)
 
 {
     activateMonitorConsumer();
     activateAlarmConsumer();
     activateLogConsumer();
+    activateConfigConsumer();
 }
 
 CorbaServant::~CorbaServant() {
     deactivateServant(monitor_consumer_impl_, "MonitorConsumer");
     deactivateServant(alarm_consumer_impl_, "AlarmConsumer");
     deactivateServant(log_consumer_impl_, "LogConsumer");
+    deactivateServant(config_consumer_impl_, "ConfigConsumer");
 }
 
 MM::Consumer_ifce_ptr CorbaServant::getMonitorConsumerObject() const {
@@ -61,20 +66,30 @@ LOG::Consumer_ifce_ptr CorbaServant::getLogConsumerObject() const {
     return LOG::Consumer_ifce::_duplicate(log_consumer_ref_.in());
 }
 
+CONFIG::Consumer_ifce_ptr CorbaServant::getConfigConsumerObject() const {
+    return CONFIG::Consumer_ifce::_duplicate(config_consumer_ref_.in());
+}
+
 void CorbaServant::activateMonitorConsumer() {
     monitor_consumer_impl_ = new MonitorConsumer(monitor_registry_);
-    CORBA::Object_var obj   = activateServantObject(monitor_consumer_impl_);
-    monitor_consumer_ref_   = MM::Consumer_ifce::_narrow(obj.in());
+    CORBA::Object_var obj = activateServantObject(monitor_consumer_impl_);
+    monitor_consumer_ref_ = MM::Consumer_ifce::_narrow(obj.in());
 }
 
 void CorbaServant::activateAlarmConsumer() {
     alarm_consumer_impl_ = new AlarmConsumer(alarm_registry_);
-    CORBA::Object_var obj  = activateServantObject(alarm_consumer_impl_);
-    alarm_consumer_ref_    = ALARM::Consumer_ifce::_narrow(obj.in());
+    CORBA::Object_var obj = activateServantObject(alarm_consumer_impl_);
+    alarm_consumer_ref_ = ALARM::Consumer_ifce::_narrow(obj.in());
 }
 
 void CorbaServant::activateLogConsumer() {
     log_consumer_impl_ = new LogConsumer(log_registry_);
-    CORBA::Object_var obj  = activateServantObject(log_consumer_impl_);
-    log_consumer_ref_    = LOG::Consumer_ifce::_narrow(obj.in());
+    CORBA::Object_var obj = activateServantObject(log_consumer_impl_);
+    log_consumer_ref_ = LOG::Consumer_ifce::_narrow(obj.in());
+}
+
+void CorbaServant::activateConfigConsumer() {
+    config_consumer_impl_ = new ConfigConsumer(config_registry_);
+    CORBA::Object_var obj = activateServantObject(config_consumer_impl_);
+    config_consumer_ref_ = CONFIG::Consumer_ifce::_narrow(obj.in());
 }
