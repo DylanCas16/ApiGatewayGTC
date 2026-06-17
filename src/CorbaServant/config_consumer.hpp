@@ -15,7 +15,7 @@ class ConfigConsumer : public POA_CONFIG::Consumer_ifce {
         explicit ConfigConsumer(Registry& registry);
         virtual ~ConfigConsumer() = default;
 
-        virtual void receiveProperty(const CONFIG::PropertyList& property_list);
+        virtual void receiveProperty(const CONFIG::PropertyChangeList& property_list);
     private:
         Registry& registry_;
 };

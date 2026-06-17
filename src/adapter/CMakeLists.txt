@@ -3,6 +3,7 @@ add_library(lib_adapter STATIC
     monitor_adapter.cpp
     alarm_adapter.cpp
     log_adapter.cpp
+    config_adapter.cpp
 )
 
 add_dependencies(lib_adapter generate_idl_stubs proto-objects)
