@@ -1,6 +1,8 @@
 #include "alarm_adapter.hpp"
 
-gateway::AlarmEvent AlarmAdapter::fromEvent(const ALARM::Event& event) {
+gateway::AlarmEvent AlarmAdapter::fromEvent(const ALARM::Event& event,
+                                            const int64_t gateway_ts)
+{
     gateway::AlarmEvent proto_event;
 
     proto_event.set_alarm_name(event.name.in());
@@ -10,6 +12,7 @@ gateway::AlarmEvent AlarmAdapter::fromEvent(const ALARM::Event& event) {
     proto_event.set_description(event.description.in());
     proto_event.set_time_stamp(fromTimeValue(event.time_stamp));
     proto_event.set_id(static_cast<int64_t>(event.id));
+    proto_event.set_gateway_ts(gateway_ts);
 
     return proto_event;
 }

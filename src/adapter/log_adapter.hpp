@@ -9,7 +9,8 @@
 
 class LogAdapter {
     public:
-        static gateway::LogEvent fromRecord(const LOG::Record& record);
+        static gateway::LogEvent fromRecord(const LOG::Record& record,
+                                            const int64_t gateway_ts);
 
     private:
         static gateway::MessageType fromType(LOG::MessageType type);

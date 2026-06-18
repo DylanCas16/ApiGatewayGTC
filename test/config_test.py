@@ -6,6 +6,7 @@ import grpc
 import server_pb2_grpc
 import stream_pb2
 import adapter_pb2
+import time
 
 
 def test_config(stub, property_name, max_events=10):
@@ -20,14 +21,20 @@ def test_config(stub, property_name, max_events=10):
 
     try:
         for data in response_stream:
+            ts_received_ms = float(time.time() * 1000)
+            latency_ms = ts_received_ms - data.gateway_ts
+
             event_count += 1
 
             print(f"Property change received ({event_count:2d}/{max_events})")
+            print(f"CORBA callback to client latency: {latency_ms} ms")
+            print("-----------------------------------")
             print(f"Config name: {data.config_name}")
             print(f"Class name: {data.class_name}")
             print(f"Component name: {data.component_name}")
             print(f"Timestamp: {data.time_stamp}")
             print("-----------------------------------")
+            print()
 
             if event_count >= max_events:
                 print(f"\nMax Config events reached ({max_events}). Closing stream...")

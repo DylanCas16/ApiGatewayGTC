@@ -6,6 +6,7 @@ import grpc
 import server_pb2_grpc
 import stream_pb2
 import adapter_pb2
+import time
 
 
 def test_log(stub, component, host_ip_filter=None, type_filter=None, timestamp_range=None, max_events=10):
@@ -21,6 +22,9 @@ def test_log(stub, component, host_ip_filter=None, type_filter=None, timestamp_r
 
     try:
         for data in response_stream:
+            ts_received_ms = float(time.time() * 1000)
+            latency_ms = ts_received_ms - data.gateway_ts
+
             if host_ip_filter is not None and data.host_ip_address != host_ip_filter:
                 skipped +=1
                 continue
@@ -34,6 +38,8 @@ def test_log(stub, component, host_ip_filter=None, type_filter=None, timestamp_r
             event_count += 1
 
             print(f"Log Message received ({event_count:2d}/{max_events})")
+            print(f"CORBA callback to client latency: {latency_ms} ms")
+            print("-----------------------------------")
             print(f"Component name: {data.component_name}")
             print(f"Host IP: {data.host_ip_address}")
             print(f"Source: {data.source_code}")
@@ -41,6 +47,7 @@ def test_log(stub, component, host_ip_filter=None, type_filter=None, timestamp_r
             print(f"Timestamp: {data.time_stamp}")
             print(f"Message data: {data.msg_data}")
             print("-----------------------------------")
+            print()
 
             if event_count >= max_events:
                 print(f"\nMax Log events reached ({max_events}). Closing stream...")

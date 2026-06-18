@@ -9,7 +9,8 @@
 
 class ConfigAdapter {
     public:
-        static gateway::ConfigEvent fromProperty(const CONFIG::PropertyChange& property_change);
+        static gateway::ConfigEvent fromProperty(const CONFIG::PropertyChange& property_change,
+                                                const int64_t gateway_ts);
     
     private:
         static int64_t fromTimeValue(const DGT::TimeValue& time_value);

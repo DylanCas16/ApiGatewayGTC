@@ -9,7 +9,8 @@
 
 class AlarmAdapter {
     public:
-        static gateway::AlarmEvent fromEvent(const ALARM::Event& event);
+        static gateway::AlarmEvent fromEvent(const ALARM::Event& event,
+                                            const int64_t gateway_ts);
 
     private:
         static gateway::AlarmState fromState(ALARM::State_t state);

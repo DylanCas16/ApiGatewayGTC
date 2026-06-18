@@ -1,6 +1,8 @@
 #include "log_adapter.hpp"
 
-gateway::LogEvent LogAdapter::fromRecord(const LOG::Record& record) {
+gateway::LogEvent LogAdapter::fromRecord(const LOG::Record& record,
+                                        const int64_t gateway_ts)
+{
     gateway::LogEvent proto_record;
 
     proto_record.set_component_name(record.gcs_component.in());
@@ -9,6 +11,7 @@ gateway::LogEvent LogAdapter::fromRecord(const LOG::Record& record) {
     proto_record.set_type(fromType(record.type));
     proto_record.set_time_stamp(fromTimeValue(record.time_stamp));
     proto_record.set_msg_data(record.msg_data.in());
+    proto_record.set_gateway_ts(gateway_ts);
 
     return proto_record;
 }

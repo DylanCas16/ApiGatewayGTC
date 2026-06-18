@@ -6,6 +6,7 @@ import grpc
 import server_pb2_grpc
 import stream_pb2
 import adapter_pb2
+import time
 
 
 def test_alarm(stub, component, alarm_filter=None, state_filter=None, severity_filter=None, max_events=10):
@@ -21,6 +22,9 @@ def test_alarm(stub, component, alarm_filter=None, state_filter=None, severity_f
 
     try:
         for data in response_stream:
+            ts_received_ms = float(time.time() * 1000)
+            latency_ms = ts_received_ms - data.gateway_ts
+
             if alarm_filter is not None and data.alarm_name != alarm_filter:
                 skipped +=1
                 continue
@@ -34,6 +38,8 @@ def test_alarm(stub, component, alarm_filter=None, state_filter=None, severity_f
             event_count += 1
 
             print(f"Alarm received ({event_count:2d}/{max_events})")
+            print(f"CORBA callback to client latency: {latency_ms} ms")
+            print("-----------------------------------")
             print(f"Alarm name: {data.alarm_name}")
             print(f"Component name: {data.component_name}")
             print(f"State: {data.state}")
@@ -42,6 +48,7 @@ def test_alarm(stub, component, alarm_filter=None, state_filter=None, severity_f
             print(f"Timestamp: {data.time_stamp}")
             print(f"ID: {data.id}")
             print("-----------------------------------")
+            print()
 
             if event_count >= max_events:
                 print(f"\nMax Alarm events reached ({max_events}). Closing stream...")

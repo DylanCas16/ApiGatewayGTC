@@ -6,6 +6,7 @@ import grpc
 import server_pb2_grpc
 import stream_pb2
 import adapter_pb2
+import time
 
 
 def convertMonitorType(type):
@@ -38,6 +39,9 @@ def test_monitor(stub, component_name, magnitude, type, max_events=10):
 
     try:
         for data in response_stream:
+            ts_received_ms = float(time.time() * 1000)
+            latency_ms = ts_received_ms - data.gateway_ts
+
             data_type = data.WhichOneof("event")
             event_count += 1
             ts_ok = True
@@ -52,12 +56,15 @@ def test_monitor(stub, component_name, magnitude, type, max_events=10):
                 last_ts = block.time_stamp
 
                 print(f"DataBlock received ({event_count:2d}/{max_events})")
+                print(f"CORBA callback to client latency: {latency_ms} ms")
+                print("-----------------------------------")
                 print(f"ID: {block.id}")
                 print(f"Component name: {block.component_name}")
                 print(f"Magnitude: {block.magnitude}")
                 print(f"Timestamp: {block.time_stamp}")
                 print(f"Samples: {block.samples}")
                 print("-----------------------------------")
+                print()
             
             if data_type == "state_change":
                 state = data.state_change
