@@ -28,11 +28,6 @@ class Config {
             gateway::SetPropResponse* response
         );
 
-        grpc::Status SubscribeConfig(
-            grpc::ServerContext* context,
-            const gateway::ConfigReq* request,
-            grpc::ServerWriter<gateway::ConfigEvent>* writer
-        );
     private:
         CorbaRuntime& corba_;
 };

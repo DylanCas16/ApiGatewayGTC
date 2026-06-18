@@ -34,7 +34,7 @@ def generate_alarm(stub, times=10, delay=2.0):
                 time.sleep(delay)
 
         except grpc.RpcError as error:
-            print(f"Invoke test failed: ({error.code().name}) {error.details()}")
+            print(f"Invoke method failed: ({error.code().name}) {error.details()}")
     
     return
 

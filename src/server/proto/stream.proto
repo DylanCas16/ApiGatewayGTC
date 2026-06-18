@@ -111,3 +111,13 @@ message LogEvent {
     int64 time_stamp = 5;
     string msg_data = 6;
 }
+
+message ConfigReq {
+    string property_name = 1;
+}
+
+message ConfigEvent {
+    string component_name = 1;
+    string property_name = 2;
+    int64 time_stamp = 3;
+}

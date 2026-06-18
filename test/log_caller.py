@@ -9,7 +9,7 @@ import unary_pb2
 import adapter_pb2
 
 
-def generate_message(stub, times=10, delay=2.0):
+def generate_message(stub, times=5, delay=2.0):
     component_name = "Test/InspectorDevice_1"
 
     for i in range(times):
@@ -31,7 +31,7 @@ def generate_message(stub, times=10, delay=2.0):
                 time.sleep(delay)
 
         except grpc.RpcError as error:
-            print(f"Invoke test failed: ({error.code().name}) {error.details()}")
+            print(f"Invoke method failed: ({error.code().name}) {error.details()}")
     
     return
 

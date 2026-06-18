@@ -26,7 +26,7 @@ uint64_t ConfigPropagator::subscribe(const std::string& property,
     return registry_.addEntry(key, writer);
 }
 
-void ConfigPropagator::unsubscribe(uint64_t id, const std::string property,
+void ConfigPropagator::unsubscribe(uint64_t id, const std::string& property,
                                 CONFIG::Consumer_ifce_ptr consumer)
 {
     bool last = registry_.removeEntry(id);

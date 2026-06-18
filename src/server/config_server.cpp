@@ -45,24 +45,3 @@ grpc::Status Config::SetProperty(
         return grpc::Status(grpc::StatusCode::INTERNAL, exception.what());
     }
 }
-
-grpc::Status Config::SubscribeConfig(
-    grpc::ServerContext* context,
-    const gateway::ConfigReq* request,
-    grpc::ServerWriter<gateway::ConfigEvent>* writer)
-{
-    const std::string& property_name = request->property_name();
-
-    CONFIG::Consumer_ifce_var consumer = corba_servant_.getConfigConsumerObject();
-
-    uint64_t id = config_propagator_.subscribe(
-        property_name,consumer.in(), writer);
-    
-    while (!context->IsCancelled() && config_registry_.isActive(id)) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-
-    config_propagator_.unsubscribe(id, property_name, consumer.in());
-
-    return grpc::Status::OK;
-}

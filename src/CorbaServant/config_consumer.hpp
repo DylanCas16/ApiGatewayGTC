@@ -5,7 +5,7 @@
 #include "CONFIGC.h"
 #include "../adapter/config_adapter.hpp"
 #include "../SubscriptionRegistry/subscription_registry.hpp"
-#include "config.pb.h"
+#include "stream.pb.h"
 
 
 class ConfigConsumer : public POA_CONFIG::Consumer_ifce {
@@ -15,7 +15,7 @@ class ConfigConsumer : public POA_CONFIG::Consumer_ifce {
         explicit ConfigConsumer(Registry& registry);
         virtual ~ConfigConsumer() = default;
 
-        virtual void receiveProperty(const CONFIG::PropertyChangeList& property_list);
+        virtual void receivePropertyChanges(const CONFIG::PropertyChangeList& property_list);
     private:
         Registry& registry_;
 };

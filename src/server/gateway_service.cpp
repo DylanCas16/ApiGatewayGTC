@@ -44,15 +44,15 @@ grpc::Status GatewayService::SetProperty(
     return config_.SetProperty(context, request, response);
 }
 
+// stream_server
+
 grpc::Status GatewayService::SubscribeConfig(
     grpc::ServerContext* context,
     const gateway::ConfigReq* request,
     grpc::ServerWriter<gateway::ConfigEvent>* writer)
 {
-    return config_.SubscribeConfig(context, request, writer);
+    return stream_.SubscribeConfig(context, request, writer);
 }
-
-// stream_server
  
 grpc::Status GatewayService::SubscribeMonitor(
     grpc::ServerContext*                       context,

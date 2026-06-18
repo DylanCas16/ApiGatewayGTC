@@ -4,7 +4,7 @@
 #include "subscription_propagator.hpp"
 #include "CONFIGC.h"
 #include "CONFIGManagerC.h"
-#include "config.pb.h"
+#include "stream.pb.h"
 
 
 class ConfigPropagator : public SubscriptionPropagator<gateway::ConfigEvent> {

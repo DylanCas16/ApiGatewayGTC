@@ -9,6 +9,7 @@
 #include "../SubscriptionPropagator/monitor_propagator.hpp"
 #include "../SubscriptionPropagator/alarm_propagator.hpp"
 #include "../SubscriptionPropagator/log_propagator.hpp"
+#include "../SubscriptionPropagator/config_propagator.hpp"
 
 
 class Stream {
@@ -16,11 +17,13 @@ class Stream {
         explicit Stream(CorbaRuntime& corba): 
             corba_(corba),
             corba_servant_(corba.orb(), corba.rootPoa(), 
-                monitor_registry_, alarm_registry_, log_registry_),
+                monitor_registry_, alarm_registry_,
+                log_registry_, config_registry_),
             
             monitor_propagator_(corba.ns(), monitor_registry_),
             alarm_propagator_(corba.ns(), alarm_registry_),
-            log_propagator_(corba.ns(), log_registry_)
+            log_propagator_(corba.ns(), log_registry_),
+            config_propagator_(corba.ns(), config_registry_)
         {}
         
         grpc::Status SubscribeMonitor(
@@ -40,16 +43,24 @@ class Stream {
             const gateway::LogReq* request,
             grpc::ServerWriter<gateway::LogEvent>* writer
         );
+
+        grpc::Status SubscribeConfig(
+            grpc::ServerContext* context,
+            const gateway::ConfigReq* request,
+            grpc::ServerWriter<gateway::ConfigEvent>* writer
+        );
     
     private:
-    CorbaRuntime& corba_;
-    CorbaServant corba_servant_;
+        CorbaRuntime& corba_;
+        CorbaServant corba_servant_;
 
-    CorbaServant::MonitorRegistry monitor_registry_;
-    CorbaServant::AlarmRegistry alarm_registry_;
-    CorbaServant::LogRegistry log_registry_;
-    
-    MonitorPropagator monitor_propagator_;
-    AlarmPropagator alarm_propagator_;
-    LogPropagator log_propagator_;
+        CorbaServant::MonitorRegistry monitor_registry_;
+        CorbaServant::AlarmRegistry alarm_registry_;
+        CorbaServant::LogRegistry log_registry_;
+        CorbaServant::ConfigRegistry config_registry_;
+        
+        MonitorPropagator monitor_propagator_;
+        AlarmPropagator alarm_propagator_;
+        LogPropagator log_propagator_;
+        ConfigPropagator config_propagator_;
 };
