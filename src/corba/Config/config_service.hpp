@@ -21,7 +21,10 @@ class ConfigService {
         bool setProperty(const CONFIG::Property& prop);
     
     private:
+        void notifyPropertyChange(const std::string& full_name);
+
         NsResolver& ns_;
+        CONFIG::Manager_ifce_var manager_;
         CONFIG::PredefConfigRepo_ifce_var repository_;
     
         ConfigService(const ConfigService&);
