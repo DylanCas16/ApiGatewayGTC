@@ -18,6 +18,7 @@ namespace AnyAdapter {
             case CORBA::tk_boolean: return gateway::TYPE_BOOLEAN;
             case CORBA::tk_octet:   return gateway::TYPE_OCTET;
             case CORBA::tk_string:  return gateway::TYPE_STRING;
+            case CORBA::tk_void:    return gateway::TYPE_VOID;
  
             case CORBA::tk_struct: {
                 const char* name = "";

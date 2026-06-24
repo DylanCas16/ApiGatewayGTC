@@ -26,6 +26,7 @@ message Method {
 
 message NamingEntry {
     string name = 1;
+    string path = 3;
     string ior = 2;
 }
 

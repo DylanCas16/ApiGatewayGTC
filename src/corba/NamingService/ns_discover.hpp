@@ -16,7 +16,7 @@ class NsResolver {
         CORBA::Object_var resolve(const std::string& path,
                                     const std::string& leaf_kind = "") const;
 
-        std::vector<NsEntry> listRoot(CORBA::ULong max_entries = 32) const;
+        std::vector<NsEntry> list(CORBA::ULong max_entries = 32) const;
 
         CosNaming::NamingContext_ptr root() const { return root_.in(); }
     
@@ -26,4 +26,15 @@ class NsResolver {
 
         static CosNaming::Name buildName(const std::string& path,
                                             const std::string& leaf_kind);
+        
+        void listContext(CosNaming::NamingContext_ptr context,
+                     const std::string& prefix,
+                     CORBA::ULong max_entries,
+                     std::vector<NsEntry>& entries) const;
+
+        void processBinding(CosNaming::NamingContext_ptr context,
+                        const CosNaming::Binding& binding,
+                        const std::string& prefix,
+                        CORBA::ULong max_entries,
+                        std::vector<NsEntry>& entries) const;
 };

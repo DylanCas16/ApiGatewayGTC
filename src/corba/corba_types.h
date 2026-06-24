@@ -9,6 +9,7 @@
 struct NsEntry {
     std::string name;
     std::string kind;
+    std::string path;
     std::string ior;
     bool is_context;
 };

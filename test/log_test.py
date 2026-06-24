@@ -9,7 +9,7 @@ import adapter_pb2
 import time
 
 
-def test_log(stub, component, host_ip_filter=None, type_filter=None, timestamp_range=None, max_events=10):
+def test_log(stub, component, host_ip_filter=None, type_filter=None, timestamp_range=None, max_events=1000):
     print("Starting log stream test...")
 
     request = stream_pb2.LogReq(component_name=component)

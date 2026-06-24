@@ -91,6 +91,7 @@ enum TypeKind {
     TYPE_OCTET     = 6;
     TYPE_STRING    = 7;
     TYPE_TIMEVALUE = 8;
+    TYPE_VOID      = 9;
 }
 
 message AnyValue {

@@ -26,14 +26,17 @@ def test_listnaming(stub):
 
     try:
         response = stub.ListNaming(unary_pb2.NamingRequest())
-        devices = [(entry.name, entry.ior) for entry in response.entries]
+        devices = [(entry.name, entry.path, entry.ior) for entry in response.entries]
 
         if devices:
             print("ListNaming success (devices found)")
             
-            for name, ior in devices:
+            for name, path, ior in devices:
+                print("----------------------------------------------------")
                 print("Name: " + name)
+                print("Path: " + path)
                 print("IOR: " + ior)
+                print()
         else:
             print("ListNaming success (devices not found)")
     except grpc.RpcError as error:

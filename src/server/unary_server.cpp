@@ -124,13 +124,14 @@ grpc::Status Unary::ListNaming(
     const gateway::NamingRequest* request,
     gateway::NamingResponse* response) 
 {
-    std::vector<NsEntry> entries = corba_.ns().listRoot();
+    std::vector<NsEntry> entries = corba_.ns().list();
     
     for (const NsEntry& entry : entries) {
         gateway::NamingEntry* proto_entry = response->add_entries();
         
         proto_entry->set_name(
             entry.kind.empty() ? entry.name : entry.name + "." + entry.kind);
+        proto_entry->set_path(entry.path);
         proto_entry->set_ior(entry.ior);
     }
 
