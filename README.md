@@ -1,5 +1,34 @@
 # Arquitectura de la Api Gateway
 
+## Compilación y ejecución
+
+### Servidor
+Para compilar el proyecto hay que situarse en el directorio `src/` y crear una carpeta `build/`. Dentro de esta se ejectarán los siguientes comandos:
+
+```
+conan install ..
+cmake ..
+make
+```
+
+Si todo ha salido correctamente, deberá estar todo el proyecto compilado en el directorio.
+
+Finalmente, para ejecutar el servidor, en el mismo directorio hay que escribir el siguiente comando:
+
+```
+./server/gateway_server
+```
+
+### Cliente (test)
+
+Para poder ejecutar cualquiera de las pruebas localizadas en `test/`, hay que crear una carpeta `generated/` y ejecutar el siguiente comando en el directorio:
+
+```
+python3 -m grpc_tools.protoc --proto_path=../src/server/proto/ --python_out=generated/ --grpc_python_out=generated/ ../src/server/proto/*
+```
+
+Una vez hecho, se podrá ejecutar cualquier prueba con la herramienta `python3`.
+
 ## Diagramas finales
 
 La arquitectura de la Api Gateway se puede visualizar mediante dos diagramas principales, los cuales muestra cómo se comunicarán los distintos componentes que conforman esta.
